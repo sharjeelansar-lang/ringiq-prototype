@@ -129,6 +129,7 @@ export default function NewBusinessPage() {
       emailCompany:         '',
       cpmid:                '',
       syeLocationId:        8,
+      vapiAssistantTemplateId: '',
       inboundPhone:         '',
       publicNumber:         '',
       twilioSid:            '',
@@ -189,7 +190,7 @@ export default function NewBusinessPage() {
     if (schema) {
       const result = schema.safeParse(form.getValues());
       if (!result.success) {
-        result.error.errors.forEach(({ path, message }) => {
+        result.error.issues.forEach(({ path, message }) => {
           if (path.length > 0) {
             form.setError(path[0] as FieldPath<BusinessFormSchema>, { type: 'manual', message });
           }

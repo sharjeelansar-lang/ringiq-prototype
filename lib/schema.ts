@@ -10,13 +10,14 @@ export const businessFormSchema = z.object({
   // A. Core Business Parameters
   practiceDisplayName: z.string().min(2, 'Practice name must be at least 2 characters'),
   corporateCleanName: z.string().min(2, 'Clean name must be at least 2 characters'),
-  environmentStatus: z.enum(['internal_testing', 'live_production']).default('internal_testing'),
+  environmentStatus: z.enum(['internal_testing', 'live_production']),
   mongoOfficeId: z.string().readonly(),
 
   // B. EHR Mapping
   emailCompany: z.string().optional(),
   cpmid: z.string().min(1, 'CPMID is required'),
   syeLocationId: z.number().int().min(1, 'Must be a valid location ID'),
+  vapiAssistantTemplateId: z.string().optional(),
 
   // C. Telephony
   inboundPhone: z.string().regex(/^\d{10}$/, 'Must be exactly 10 digits'),
@@ -26,9 +27,9 @@ export const businessFormSchema = z.object({
     .optional()
     .or(z.literal('')),
   // Auto-populated by the Twilio provisioning widget — never manually entered
-  twilioSid: z.string().optional().default(''),
-  twilioSubAccountSid: z.string().optional().default(''),
-  carrierTrunkName: z.string().optional().default(''),
+  twilioSid: z.string().optional(),
+  twilioSubAccountSid: z.string().optional(),
+  carrierTrunkName: z.string().optional(),
   failoverRingCount: z.number().int().min(1).max(5),
   voipRoutingType: z.literal('sip'),
 
