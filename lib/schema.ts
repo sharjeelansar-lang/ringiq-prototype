@@ -36,9 +36,11 @@ export const businessFormSchema = z.object({
     .regex(/^\+[1-9]\d{1,14}$/, 'Must be a valid E.164 phone number (e.g. +15869916560)')
     .optional()
     .or(z.literal('')),
-  // Auto-populated by the Twilio provisioning widget — never manually entered
+  // Auto-populated by the provisioning widget — never manually entered
   twilioSid: z.string().optional(),
   twilioSubAccountSid: z.string().optional(),
+  twilioSubAccountToken: z.string().optional(),
+  vapiAssistantId: z.string().optional(),
   carrierTrunkName: z.string().optional(),
   failoverRingCount: z.number().int().min(1).max(5),
   voipRoutingType: z.literal('sip'),

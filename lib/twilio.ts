@@ -1,15 +1,15 @@
 import twilio from 'twilio';
 
-// API Key client — used for sub-account creation
+// Auth Token client — must use AccountSID + AuthToken (NOT API Key) for sub-account creation
+// because Twilio SDK v6 returns null for authToken on AccountInstance when authenticated via API Key.
 export function getTwilioClient() {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const apiKey    = process.env.TWILIO_API_KEY;
-  const apiSecret = process.env.TWILIO_API_SECRET;
+  const authToken  = process.env.TWILIO_AUTH_TOKEN;
 
   if (!accountSid) throw new Error('TWILIO_ACCOUNT_SID not set in .env');
-  if (!apiKey || !apiSecret) throw new Error('TWILIO_API_KEY / TWILIO_API_SECRET not set in .env');
+  if (!authToken)  throw new Error('TWILIO_AUTH_TOKEN not set in .env');
 
-  return twilio(apiKey, apiSecret, { accountSid });
+  return twilio(accountSid, authToken);
 }
 
 // Main Auth Token client — required for availablePhoneNumbers and number purchase

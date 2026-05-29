@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import type { FieldPath } from 'react-hook-form';
 import {
   ArrowLeft, Check, CheckCircle2, ExternalLink,
-  Building2, Phone, MapPin,
+  Building2, Phone, MapPin, Bot,
 } from 'lucide-react';
 
 import { Sidebar } from '@/components/dashboard/Sidebar';
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { CoreBusinessSection }  from '@/components/form/sections/CoreBusinessSection';
 import { EHRMappingSection }    from '@/components/form/sections/EHRMappingSection';
 import { ProvisioningSection }  from '@/components/form/sections/ProvisioningSection';
+import { VapiSetupSection }     from '@/components/form/sections/VapiSetupSection';
 import { TelephonySection }     from '@/components/form/sections/TelephonySection';
 import { LocalizationSection }  from '@/components/form/sections/LocalizationSection';
 
@@ -39,6 +40,13 @@ const STEPS = [
     icon: Phone,
   },
   {
+    id: 'vapi',
+    label: 'VAPI AI Setup',
+    shortLabel: 'VAPI',
+    subtitle: 'Deploy the Iris AI assistant and link the VAPI line',
+    icon: Bot,
+  },
+  {
     id: 'location',
     label: 'Site & Schedule',
     shortLabel: 'Schedule',
@@ -51,7 +59,8 @@ const STEPS = [
 // other steps' fields and cannot pre-populate their errors.
 const STEP_SCHEMAS = [
   businessFormSchema.pick({ practiceDisplayName: true, corporateCleanName: true, cpmid: true, syeLocationId: true }),
-  null, // Twilio step has no required fields to gate on
+  null, // Twilio — no required fields
+  null, // VAPI — no required fields
   businessFormSchema.pick({ timezone: true, streetAddress: true, city: true, state: true, zipCode: true }),
 ];
 
@@ -135,8 +144,10 @@ export default function NewBusinessPage() {
       publicNumber:              '',
       failoverTransferNumber:    '',
       twilioSid:                 '',
-      twilioSubAccountSid:  '',
-      carrierTrunkName:     '',
+      twilioSubAccountSid:       '',
+      twilioSubAccountToken:     '',
+      vapiAssistantId:           '',
+      carrierTrunkName:          '',
       failoverRingCount:    3,
       voipRoutingType:      'sip',
       timezone:             '',
@@ -179,6 +190,7 @@ export default function NewBusinessPage() {
       setCreatedId(json.officeId);
       setSubmitState('success');
       toast.success('Business registered successfully.');
+      try { localStorage.removeItem('ringiq_twilio_creds'); } catch { /* ignore */ }
       setTimeout(() => router.push('/dashboard'), 2500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to create office';
@@ -271,11 +283,11 @@ export default function NewBusinessPage() {
         <main className="flex-1 min-h-0 overflow-hidden">
           <div className={cn(
             'h-full overflow-y-auto max-w-5xl mx-auto w-full px-10',
-            step === 2 ? 'py-5' : 'py-8',
+            step === 3 ? 'py-5' : 'py-8',
           )}>
 
             {/* Step title + progress line */}
-            <div className={step === 2 ? 'mb-4' : 'mb-7'}>
+            <div className={step === 3 ? 'mb-4' : 'mb-7'}>
               <h2 className="text-xl font-bold text-white tracking-tight">{STEPS[step].label}</h2>
               <div className="mt-3 h-px bg-slate-800/60 relative overflow-hidden rounded-full">
                 <div
@@ -301,8 +313,11 @@ export default function NewBusinessPage() {
               {/* Step 1: Twilio Provisioning */}
               {step === 1 && <ProvisioningSection form={form} />}
 
-              {/* Step 2: Site & Schedule */}
-              {step === 2 && <LocalizationSection form={form} />}
+              {/* Step 2: VAPI AI Setup */}
+              {step === 2 && <VapiSetupSection form={form} />}
+
+              {/* Step 3: Site & Schedule */}
+              {step === 3 && <LocalizationSection form={form} />}
 
             </form>
           </div>
@@ -339,9 +354,11 @@ export default function NewBusinessPage() {
               </button>
             ) : (
               <button
-                type="submit"
-                form="business-form"
+                type="button"
                 disabled={submitState === 'loading'}
+                onClick={() => form.handleSubmit(handleFinalSubmit, () => {
+                  toast.error('Some required fields are missing — check all steps before submitting.');
+                })()}
                 className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold
                   bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all
                   shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 disabled:opacity-60 disabled:cursor-not-allowed"

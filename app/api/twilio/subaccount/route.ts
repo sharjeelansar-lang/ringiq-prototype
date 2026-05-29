@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTwilioClient } from '@/lib/twilio';
+import { getTwilioMainClient } from '@/lib/twilio';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
-    const client = getTwilioClient();
+    const client = getTwilioMainClient();
 
     const subAccount = await client.api.v2010.accounts.create({
       friendlyName: friendlyName.trim(),
