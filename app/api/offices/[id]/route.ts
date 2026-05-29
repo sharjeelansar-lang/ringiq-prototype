@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 import { getDb } from '@/lib/mongodb';
-import { getTwilioMainClient } from '@/lib/twilio';
+import { getTwilioMainClient, getTwilioSubClient } from '@/lib/twilio';
 
 export async function GET(
   _req: NextRequest,
@@ -52,13 +52,25 @@ export async function DELETE(
     }
 
     if (deleteNumber) {
-      const phoneSid = office.twilioNumbers?.[0]?.sid as string | undefined;
+      // Numbers purchased on a sub-account must be released via that sub-account client.
+      // Fall back to main client only when no sub-account creds are stored.
+      const phoneSid        = office.twilioNumbers?.[0]?.sid as string | undefined;
+      const subAccountSid   = office.twilioSubAccountSid   as string | undefined;
+      const subAccountToken = office.twilioSubAccountToken as string | undefined;
+
       if (phoneSid) {
         if (process.env.TWILIO_TEST_MODE === 'true') {
           console.log(`[DELETE] Test mode — skipping Twilio number release for SID: ${phoneSid}`);
         } else {
-          const client = getTwilioMainClient();
-          await client.incomingPhoneNumbers(phoneSid).remove();
+          const client = subAccountSid && subAccountToken
+            ? getTwilioSubClient(subAccountSid, subAccountToken)
+            : getTwilioMainClient();
+          try {
+            await client.incomingPhoneNumbers(phoneSid).remove();
+          } catch (twilioErr) {
+            // Log but don't abort — still delete the office record even if Twilio release fails
+            console.error('[DELETE] Twilio number release failed:', twilioErr);
+          }
         }
       }
     }
