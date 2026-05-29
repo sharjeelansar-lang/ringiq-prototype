@@ -48,6 +48,9 @@ export async function POST(req: NextRequest) {
         capabilities: purchased.capabilities,
         dateCreated: purchased.dateCreated,
       },
+      // Echo back sub-account credentials so the frontend can persist them reliably
+      subAccountSid:   subAccountSid   ?? null,
+      subAccountToken: subAccountToken ?? null,
     }, { status: 201 });
 
   } catch (err: unknown) {

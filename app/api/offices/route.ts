@@ -77,6 +77,8 @@ export async function POST(req: NextRequest) {
       twilioSubAccountSid,
       publicNumber,
       failoverTransferNumber,
+      vapiAssistantId,
+      twilioSubAccountToken,
       emailCompany,
       timezone,
       streetAddress,
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
         street: streetAddress,
         city,
         state,
-        zip: parseInt(zipCode, 10),
+        zip: zipCode,
       },
       email: {
         company: emailCompany ?? '',
@@ -122,6 +124,8 @@ export async function POST(req: NextRequest) {
         }] : []),
       ],
       failoverNumber: failoverTransferNumber ?? '',
+      vapiAssistantId: vapiAssistantId ?? '',
+      twilioSubAccountToken: twilioSubAccountToken ?? '',
       skipRecordingMessage: !recordingDisclosure,
       workingHours: operationalHours ? buildWorkingHours(operationalHours) : {},
       workingLunchHours: internalWorkingHours

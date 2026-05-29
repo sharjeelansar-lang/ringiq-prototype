@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)"
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(pip show *)",
+      "Bash(pip install *)",
+      "Bash(pyenv versions *)",
+      "Read(//Users/sharjeelansar/.pyenv/versions/**)",
+      "Bash(brew list *)",
+      "Bash(/opt/homebrew/opt/python@3.13/bin/pip3.13 install *)",
+      "Bash(pyenv install *)",
+      "Bash(pyenv virtualenv *)",
+      "Bash(brew install *)",
+      "Bash(curl -LsSf https://astral.sh/uv/install.sh)",
+      "Bash(sh)",
+      "WebFetch(domain:www.twilio.com)",
+      "WebFetch(domain:docs.vapi.ai)"
     ]
   }
 }
