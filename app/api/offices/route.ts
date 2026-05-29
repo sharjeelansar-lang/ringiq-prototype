@@ -72,9 +72,11 @@ export async function POST(req: NextRequest) {
       cpmid,
       syeLocationId,
       inboundPhone,
+      vapiAssistantPhoneNumber,
       twilioSid,
       twilioSubAccountSid,
       publicNumber,
+      failoverTransferNumber,
       emailCompany,
       timezone,
       streetAddress,
@@ -103,15 +105,23 @@ export async function POST(req: NextRequest) {
       tzName: timezone,
       tzOffset,
       publicNumber: publicNumber ?? '',
-      twilioNumbers: inboundPhone ? [
-        {
+      twilioNumbers: [
+        ...(inboundPhone ? [{
           number: inboundPhone,
           title: 'Main',
           disabled: false,
           sid: twilioSid ?? '',
           subAccountSid: twilioSubAccountSid ?? '',
-        },
-      ] : [],
+        }] : []),
+        ...(vapiAssistantPhoneNumber ? [{
+          number: vapiAssistantPhoneNumber,
+          title: 'VAPI',
+          disabled: false,
+          sid: '',
+          subAccountSid: twilioSubAccountSid ?? '',
+        }] : []),
+      ],
+      failoverNumber: failoverTransferNumber ?? '',
       skipRecordingMessage: !recordingDisclosure,
       workingHours: operationalHours ? buildWorkingHours(operationalHours) : {},
       workingLunchHours: internalWorkingHours
