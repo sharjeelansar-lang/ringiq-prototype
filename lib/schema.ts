@@ -21,9 +21,19 @@ export const businessFormSchema = z.object({
 
   // C. Telephony
   inboundPhone: z.string().regex(/^\d{10}$/, 'Must be exactly 10 digits'),
+  vapiAssistantPhoneNumber: z
+    .string()
+    .regex(/^\d{10}$/, 'Must be exactly 10 digits')
+    .optional()
+    .or(z.literal('')),
   publicNumber: z
     .string()
     .regex(/^\+[1-9]\d{1,14}$/, 'Must be a valid E.164 phone number (e.g. +12085527323)')
+    .optional()
+    .or(z.literal('')),
+  failoverTransferNumber: z
+    .string()
+    .regex(/^\+[1-9]\d{1,14}$/, 'Must be a valid E.164 phone number (e.g. +15869916560)')
     .optional()
     .or(z.literal('')),
   // Auto-populated by the Twilio provisioning widget — never manually entered
