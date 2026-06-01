@@ -16,7 +16,7 @@ export function Toggle({ checked, onChange, label, description, disabled }: Togg
       className={cn(
         'flex items-center justify-between p-3.5 rounded-lg border transition-all duration-200 cursor-pointer group',
         checked
-          ? 'bg-cyan-500/5 border-cyan-500/30'
+          ? 'bg-[#274993]/8 border-[#274993]/30'
           : 'bg-slate-900/40 border-slate-700/40 hover:border-slate-600/60',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
@@ -31,7 +31,7 @@ export function Toggle({ checked, onChange, label, description, disabled }: Togg
       <div
         className={cn(
           'relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0 ml-4',
-          checked ? 'bg-cyan-500' : 'bg-slate-700'
+          checked ? 'bg-[#274993]' : 'bg-slate-700'
         )}
       >
         <div

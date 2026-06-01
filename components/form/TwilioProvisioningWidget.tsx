@@ -43,16 +43,34 @@ interface Props {
   onSkip: () => void;
 }
 
-// ── Small atoms ───────────────────────────────────────────────────────────────
+const T = {
+  bg:      '#F7F6F3',
+  surface: '#FFFFFF',
+  border:  '#E2E8F0',
+  navy:    '#0F172A',
+  mid:     '#1E293B',
+  muted:   '#64748B',
+  light:   '#94A3B8',
+  teal:    '#274993',
+  tealFd:  '#EEF4FF',
+  tealBd:  '#D8E5FF',
+  hover:   '#F8FAFC',
+};
+
+// ── Step badge ────────────────────────────────────────────────────────────────
 
 function StepBadge({ n, done, active }: { n: number; done: boolean; active: boolean }) {
+  const bg    = done   ? '#10B981' : active ? T.teal : T.border;
+  const color = done   ? '#fff'    : active ? '#fff' : T.light;
   return (
-    <div className={cn(
-      'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all',
-      done   ? 'bg-emerald-500 text-slate-950'
-      : active ? 'bg-cyan-500 text-slate-950'
-      : 'bg-slate-800 text-slate-500',
-    )}>
+    <div style={{
+      width: 24, height: 24, borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 11, fontWeight: 700, flexShrink: 0,
+      background: bg, color,
+      boxShadow: active ? `0 0 0 3px ${T.tealBd}` : 'none',
+      transition: 'all 0.15s',
+    }}>
       {done ? '✓' : n}
     </div>
   );
@@ -152,8 +170,6 @@ export function TwilioProvisioningWidget({ practiceName, onProvisioned, onSkip }
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error);
       const result = json.number as PurchasedNumber;
-      // Use credentials echoed from the purchase response as the authoritative source.
-      // This avoids any React stale-closure or watch() miss on subAccount.authToken.
       const confirmedSubAccount: SubAccount | null = json.subAccountSid
         ? {
             sid:          json.subAccountSid,
@@ -179,29 +195,37 @@ export function TwilioProvisioningWidget({ practiceName, onProvisioned, onSkip }
 
   if (purchased) {
     return (
-      <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-6 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-            <CheckCircle2 size={18} className="text-emerald-400" />
+      <div style={{
+        borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)',
+        background: 'rgba(16,185,129,0.04)', padding: 24,
+        display: 'flex', flexDirection: 'column', gap: 16,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+            background: 'rgba(16,185,129,0.10)', border: '1px solid rgba(16,185,129,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <CheckCircle2 size={17} style={{ color: '#10B981' }} />
           </div>
           <div>
-            <p className="text-sm font-bold text-emerald-300">Twilio number provisioned</p>
-            <p className="text-xs text-slate-500 mt-0.5">Continue to the VAPI step to deploy the AI assistant.</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#059669', margin: 0 }}>Twilio number provisioned</p>
+            <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Continue to the VAPI step to deploy the AI assistant.</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1 p-3 rounded-lg bg-slate-900/60 border border-slate-800">
-            <span className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Phone Number</span>
-            <span className="text-sm font-mono text-emerald-400">{purchased.phoneNumber}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '10px 12px', borderRadius: 8, background: T.hover, border: `1px solid ${T.border}` }}>
+            <span style={{ fontSize: 10, color: T.light, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Phone Number</span>
+            <span style={{ fontSize: 13, fontFamily: 'var(--font-geist-mono)', color: '#059669' }}>{purchased.phoneNumber}</span>
           </div>
-          <div className="flex flex-col gap-1 p-3 rounded-lg bg-slate-900/60 border border-slate-800">
-            <span className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Twilio SID</span>
-            <span className="text-xs font-mono text-slate-400 break-all">{purchased.sid}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '10px 12px', borderRadius: 8, background: T.hover, border: `1px solid ${T.border}` }}>
+            <span style={{ fontSize: 10, color: T.light, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Twilio SID</span>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: T.muted, wordBreak: 'break-all' }}>{purchased.sid}</span>
           </div>
           {subAccount && (
-            <div className="col-span-2 flex flex-col gap-1 p-3 rounded-lg bg-slate-900/60 border border-slate-800">
-              <span className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Sub-Account SID</span>
-              <span className="text-xs font-mono text-slate-400">{subAccount.sid}</span>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 4, padding: '10px 12px', borderRadius: 8, background: T.hover, border: `1px solid ${T.border}` }}>
+              <span style={{ fontSize: 10, color: T.light, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Sub-Account SID</span>
+              <span style={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: T.muted }}>{subAccount.sid}</span>
             </div>
           )}
         </div>
@@ -212,155 +236,215 @@ export function TwilioProvisioningWidget({ practiceName, onProvisioned, onSkip }
   // ── Main 3-step form ──────────────────────────────────────────────────────
 
   return (
-    <div className="rounded-xl border border-slate-800/60 bg-slate-900/20">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/60 bg-slate-900/40">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg border border-cyan-400/20 bg-cyan-400/10">
-            <Phone size={15} className="text-cyan-400" />
+    <div style={{ borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
+
+      {/* Card header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '14px 20px', borderBottom: `1px solid ${T.border}`,
+        background: T.hover,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+            background: T.tealFd, border: `1px solid ${T.tealBd}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Phone size={14} style={{ color: T.teal }} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-100">Twilio Provisioning</p>
-            <p className="text-xs text-slate-500">Create sub-account · Search numbers · Purchase</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Twilio Provisioning</p>
+            <p style={{ fontSize: 11, color: T.muted }}>Create sub-account · Search numbers · Purchase</p>
           </div>
         </div>
-        <button type="button" onClick={onSkip}
-          className="text-xs text-slate-600 hover:text-slate-400 transition-colors underline">
+        <button type="button" onClick={onSkip} style={{
+          fontSize: 12, color: T.muted, background: 'none', border: 'none',
+          cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit',
+        }}>
           Skip — enter manually
         </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-4">
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Step 1 */}
-        <div className="flex gap-4">
+        <div style={{ display: 'flex', gap: 14 }}>
           <StepBadge n={1} done={!!subAccount} active={subStep === 'active'} />
-          <div className="flex flex-col gap-3 flex-1 min-w-0">
-            <div className="flex items-center justify-between">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p className="text-sm font-semibold text-slate-200">Create Twilio Sub-Account</p>
-                <p className="text-xs text-slate-500 mt-0.5">Isolates this tenant's billing and numbers</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Create Twilio Sub-Account</p>
+                <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Isolates this tenant's billing and numbers</p>
               </div>
               {subAccount && (
-                <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-full">
+                <span style={{
+                  fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: '#059669',
+                  background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+                  padding: '3px 8px', borderRadius: 100,
+                }}>
                   {subAccount.sid.slice(0, 16)}…
                 </span>
               )}
             </div>
             {!subAccount ? (
               <>
-                <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/60 rounded-lg px-3 py-2.5 focus-within:border-cyan-500/50 focus-within:ring-1 focus-within:ring-cyan-500/30 transition-all">
-                  <Building2 size={13} className="text-slate-500 shrink-0" />
-                  <input type="text" value={friendlyName} onChange={(e) => setFriendlyName(e.target.value)}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: T.surface, border: `1.5px solid ${T.border}`,
+                  borderRadius: 8, padding: '8px 12px',
+                }}>
+                  <Building2 size={13} style={{ color: T.light, flexShrink: 0 }} />
+                  <input
+                    type="text" value={friendlyName}
+                    onChange={(e) => setFriendlyName(e.target.value)}
                     placeholder="Friendly name for this sub-account"
-                    className="flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-600 outline-none" />
+                    style={{
+                      flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                      fontSize: 13, color: T.navy, fontFamily: 'inherit',
+                    }}
+                  />
                 </div>
-                {subError && <p className="text-xs text-red-400">{subError}</p>}
-                <button type="button" onClick={createSubAccount} disabled={subLoading}
-                  className="flex items-center gap-2 w-fit px-4 py-2 rounded-lg text-sm font-semibold
-                    bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700
-                    transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                  {subLoading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} className="text-cyan-400" />}
+                {subError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{subError}</p>}
+                <button type="button" onClick={createSubAccount} disabled={subLoading} style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  background: '#274993', color: '#fff', border: 'none',
+                  cursor: subLoading ? 'not-allowed' : 'pointer',
+                  opacity: subLoading ? 0.6 : 1, fontFamily: 'inherit',
+                  width: 'fit-content',
+                }}>
+                  {subLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Zap size={13} />}
                   {subLoading ? 'Creating…' : 'Create Sub-Account'}
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-2 text-xs text-emerald-400">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#059669' }}>
                 <CheckCircle2 size={13} /> Sub-account created · Status: {subAccount.status}
               </div>
             )}
           </div>
         </div>
 
-        <div className="border-t border-slate-800/40" />
+        <div style={{ borderTop: `1px solid ${T.border}` }} />
 
         {/* Step 2 */}
-        <div className={cn('flex gap-4', !subAccount && 'opacity-40 pointer-events-none')}>
+        <div style={{ display: 'flex', gap: 14, opacity: !subAccount ? 0.45 : 1, pointerEvents: !subAccount ? 'none' : 'auto' }}>
           <StepBadge n={2} done={!!purchased} active={searchStep === 'active'} />
-          <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minWidth: 0 }}>
             <div>
-              <p className="text-sm font-semibold text-slate-200">Search Available Numbers</p>
-              <p className="text-xs text-slate-500 mt-0.5">Enter an area code to find local numbers</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Search Available Numbers</p>
+              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Enter an area code to find local numbers</p>
             </div>
-            <div className="flex gap-2">
-              <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/60 rounded-lg px-3 py-2.5 flex-1">
-                <span className="text-slate-500 text-sm">+1</span>
-                <div className="w-px h-4 bg-slate-700" />
-                <input type="text" value={areaCode}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8, flex: 1,
+                background: T.surface, border: `1.5px solid ${T.border}`,
+                borderRadius: 8, padding: '8px 12px',
+              }}>
+                <span style={{ fontSize: 13, color: T.muted }}>+1</span>
+                <div style={{ width: 1, height: 16, background: T.border }} />
+                <input
+                  type="text" value={areaCode}
                   onChange={(e) => setAreaCode(e.target.value.replace(/\D/g, '').slice(0, 3))}
                   onKeyDown={(e) => e.key === 'Enter' && searchNumbers()}
                   placeholder="Area code (e.g. 586)"
-                  className="flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-600 outline-none font-mono" />
+                  style={{
+                    flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                    fontSize: 13, color: T.navy, fontFamily: 'var(--font-geist-mono)',
+                  }}
+                />
               </div>
               <button type="button" onClick={searchNumbers}
                 disabled={areaCode.length !== 3 || searchLoading}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
-                  bg-cyan-500/10 hover:bg-cyan-500/15 text-cyan-300 border border-cyan-500/30
-                  transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                {searchLoading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  background: T.tealFd, color: T.teal, border: `1.5px solid ${T.tealBd}`,
+                  cursor: areaCode.length !== 3 || searchLoading ? 'not-allowed' : 'pointer',
+                  opacity: areaCode.length !== 3 || searchLoading ? 0.5 : 1,
+                  fontFamily: 'inherit', flexShrink: 0,
+                }}>
+                {searchLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Search size={13} />}
                 {searchLoading ? 'Searching…' : 'Search'}
               </button>
             </div>
-            {searchError && <p className="text-xs text-red-400">{searchError}</p>}
+            {searchError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{searchError}</p>}
             {hasSearched && !searchLoading && searchResults.length > 0 && (
-              <div className="flex flex-col gap-1.5 max-h-72 overflow-y-auto pr-1">
-                {searchResults.map((num) => (
-                  <div key={num.phoneNumber} onClick={() => setSelectedNumber(num)}
-                    className={cn(
-                      'flex items-center justify-between gap-3 px-3.5 py-3 rounded-lg border cursor-pointer transition-all duration-150',
-                      selectedNumber?.phoneNumber === num.phoneNumber
-                        ? 'bg-cyan-500/8 border-cyan-500/40 shadow-[0_0_0_1px_rgba(6,182,212,0.15)]'
-                        : 'bg-slate-900/40 border-slate-700/40 hover:border-slate-600/60',
-                    )}>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-sm font-mono font-semibold text-slate-100">{num.phoneNumber}</span>
-                      <span className="text-xs text-slate-500">{num.locality}, {num.region} {num.postalCode}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {num.capabilities.voice && <Mic size={12} className="text-slate-500" />}
-                      {num.capabilities.sms && <MessageSquare size={12} className="text-slate-500" />}
-                      <div className={cn(
-                        'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
-                        selectedNumber?.phoneNumber === num.phoneNumber ? 'border-cyan-400 bg-cyan-400' : 'border-slate-600',
-                      )}>
-                        {selectedNumber?.phoneNumber === num.phoneNumber && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />
-                        )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 240, overflowY: 'auto' }}>
+                {searchResults.map((num) => {
+                  const isSelected = selectedNumber?.phoneNumber === num.phoneNumber;
+                  return (
+                    <div key={num.phoneNumber} onClick={() => setSelectedNumber(num)} style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                      padding: '10px 14px', borderRadius: 8, cursor: 'pointer',
+                      border: `1.5px solid ${isSelected ? T.tealBd : T.border}`,
+                      background: isSelected ? T.tealFd : T.surface,
+                      transition: 'all 0.12s',
+                    }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <span style={{ fontSize: 13, fontFamily: 'var(--font-geist-mono)', fontWeight: 600, color: T.navy }}>
+                          {num.phoneNumber}
+                        </span>
+                        <span style={{ fontSize: 11, color: T.muted }}>{num.locality}, {num.region} {num.postalCode}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {num.capabilities.voice && <Mic size={12} style={{ color: T.light }} />}
+                        {num.capabilities.sms && <MessageSquare size={12} style={{ color: T.light }} />}
+                        <div style={{
+                          width: 16, height: 16, borderRadius: '50%',
+                          border: `2px solid ${isSelected ? T.teal : T.border}`,
+                          background: isSelected ? T.teal : 'transparent',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'all 0.12s',
+                        }}>
+                          {isSelected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
-        <div className="border-t border-slate-800/40" />
+        <div style={{ borderTop: `1px solid ${T.border}` }} />
 
         {/* Step 3 */}
-        <div className={cn('flex gap-4', (!selectedNumber || purchased) && 'opacity-40 pointer-events-none')}>
+        <div style={{ display: 'flex', gap: 14, opacity: (!selectedNumber || purchased) ? 0.45 : 1, pointerEvents: (!selectedNumber || purchased) ? 'none' : 'auto' }}>
           <StepBadge n={3} done={!!purchased} active={purchaseStep === 'active'} />
-          <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minWidth: 0 }}>
             <div>
-              <p className="text-sm font-semibold text-slate-200">Purchase Number</p>
-              <p className="text-xs text-slate-500 mt-0.5">Finalises purchase under this practice's sub-account</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Purchase Number</p>
+              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Finalises purchase under this practice's sub-account</p>
             </div>
             {selectedNumber && (
-              <div className="flex items-center gap-3 px-3.5 py-3 rounded-lg bg-slate-900/60 border border-slate-800">
-                <Phone size={14} className="text-cyan-400 shrink-0" />
-                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                  <span className="text-sm font-mono text-slate-100">{selectedNumber.phoneNumber}</span>
-                  <span className="text-xs text-slate-500">{selectedNumber.locality}, {selectedNumber.region}</span>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 14px', borderRadius: 8,
+                background: T.hover, border: `1px solid ${T.border}`,
+              }}>
+                <Phone size={14} style={{ color: T.teal, flexShrink: 0 }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 13, fontFamily: 'var(--font-geist-mono)', color: T.navy }}>{selectedNumber.phoneNumber}</span>
+                  <span style={{ fontSize: 11, color: T.muted }}>{selectedNumber.locality}, {selectedNumber.region}</span>
                 </div>
-                <ArrowRight size={14} className="text-slate-600" />
+                <ArrowRight size={13} style={{ color: T.light }} />
               </div>
             )}
-            {purchaseError && <p className="text-xs text-red-400">{purchaseError}</p>}
+            {purchaseError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{purchaseError}</p>}
             <button type="button" onClick={purchaseNumber}
               disabled={!selectedNumber || purchaseLoading}
-              className="flex items-center gap-2 w-fit px-5 py-2.5 rounded-lg text-sm font-bold
-                bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all
-                shadow-lg shadow-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed">
-              {purchaseLoading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                background: '#10B981', color: '#fff', border: 'none',
+                cursor: !selectedNumber || purchaseLoading ? 'not-allowed' : 'pointer',
+                opacity: !selectedNumber || purchaseLoading ? 0.5 : 1,
+                boxShadow: '0 4px 14px rgba(16,185,129,0.25)',
+                fontFamily: 'inherit', width: 'fit-content',
+              }}>
+              {purchaseLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <CheckCircle2 size={13} />}
               {purchaseLoading ? 'Purchasing…' : 'Confirm Purchase'}
             </button>
           </div>

@@ -1,43 +1,33 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Eye, EyeOff, Zap, AlertCircle,
-  Mail, Lock, ArrowRight, Loader2, Shield,
+  Activity, AlertCircle, ArrowRight, CheckCircle2, Eye,
+  EyeOff, KeyRound, Loader2, Lock, Mail, ShieldCheck,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-// ── Magic UI: Border Beam ─────────────────────────────────────────────────────
+const BRAND = '#274993';
+const BRAND_DARK = '#1D3870';
+const BRAND_SOFT = '#EEF4FF';
+const BRAND_LINE = '#D8E5FF';
 
-function BorderBeam({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={cn('pointer-events-none absolute inset-0 rounded-[inherit] overflow-hidden', className)}
-    >
-      {/* Rotating conic gradient — shows as 1px border via parent p-px */}
-      <span
-        className="absolute inset-[-100%] opacity-70"
-        style={{
-          background:
-            'conic-gradient(from 0deg, transparent 0%, transparent 55%, #22d3ee 67%, #818cf8 78%, transparent 83%, transparent 100%)',
-          animation: 'spin 5s linear infinite',
-        }}
-      />
-    </span>
-  );
-}
-
-// ── Magic UI: Animated field wrapper ─────────────────────────────────────────
+const T = {
+  bg: '#F7F6F3',
+  surface: '#FFFFFF',
+  border: '#E2E8F0',
+  navy: '#0F172A',
+  mid: '#334155',
+  muted: '#64748B',
+  light: '#94A3B8',
+  inputBg: '#F8FAFC',
+};
 
 function FieldRow({
-  label,
-  icon: Icon,
-  right,
-  children,
-  delay = 0,
+  id, label, icon: Icon, right, children, delay = 0,
 }: {
+  id: string;
   label: string;
   icon: React.ElementType;
   right?: React.ReactNode;
@@ -45,44 +35,48 @@ function FieldRow({
   delay?: number;
 }) {
   return (
-    <div style={{ animation: `fade-up .55s ease-out ${delay}ms both` }}>
-      <div className="flex items-center justify-between mb-1.5">
-        <label className="text-[10px] font-semibold tracking-[0.12em] uppercase text-slate-500">
-          {label}
-        </label>
+    <div className="login-field" style={{ animationDelay: `${delay}ms` }}>
+      <div className="login-field-label-row">
+        <label htmlFor={id} className="login-label">{label}</label>
         {right}
       </div>
-      <div
-        className={cn(
-          'flex items-center gap-2.5 rounded-xl px-3.5',
-          'bg-slate-950/70 border border-slate-800',
-          'focus-within:border-cyan-500/50 focus-within:ring-1 focus-within:ring-cyan-500/15',
-          'hover:border-slate-700 transition-all duration-200',
-        )}
-      >
-        <Icon size={14} className="text-slate-600 shrink-0" />
+      <div className="login-input-frame">
+        <Icon size={17} className="login-input-icon" />
         {children}
       </div>
     </div>
   );
 }
 
-// ── LoginCard ─────────────────────────────────────────────────────────────────
+const inputStyle: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  height: 50,
+  background: 'transparent',
+  padding: 0,
+  fontSize: 16,
+  color: T.navy,
+  outline: 'none',
+  border: 'none',
+  fontFamily: 'inherit',
+  WebkitBoxShadow: `0 0 0 1000px ${T.inputBg} inset`,
+  WebkitTextFillColor: T.navy,
+};
 
 export function LoginCard() {
   const router = useRouter();
-  const [email,        setEmail]        = useState('');
-  const [password,     setPassword]     = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error,        setError]        = useState('');
-  const [loading,      setLoading]      = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res  = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -101,234 +95,530 @@ export function LoginCard() {
   };
 
   return (
-    <div
-      className="w-full max-w-[400px]"
-      style={{ animation: 'fade-up .65s ease-out both' }}
-    >
-      {/* ── Gradient border wrapper (p-px trick) ── */}
-      <div className="relative p-px rounded-2xl">
-        <BorderBeam />
+    <div className="login-shell">
+      <style>{`
+        .login-shell {
+          width: min(1040px, 100%);
+          min-height: 620px;
+          display: grid;
+          grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1fr);
+          border: 1px solid rgba(39, 73, 147, 0.14);
+          border-radius: 24px;
+          background: ${T.surface};
+          box-shadow: 0 26px 80px rgba(15, 23, 42, 0.12), 0 2px 12px rgba(15, 23, 42, 0.04);
+          overflow: hidden;
+          animation: login-rise 0.55s ease both;
+        }
 
-        {/* ── Card body ── */}
-        <div className="relative rounded-2xl bg-slate-900/90 backdrop-blur-2xl overflow-hidden">
+        .login-brand-panel {
+          position: relative;
+          padding: 34px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          background:
+            linear-gradient(140deg, rgba(39, 73, 147, 0.98) 0%, rgba(29, 56, 112, 0.98) 58%, rgba(15, 23, 42, 0.98) 100%);
+          color: #fff;
+          isolation: isolate;
+        }
 
-          {/* Top highlight line that sweeps once on load */}
-          <div className="absolute inset-x-0 top-0 h-px overflow-hidden pointer-events-none">
-            <div
-              className="absolute top-0 h-full w-2/5"
-              style={{
-                background: 'linear-gradient(90deg, transparent, rgba(34,211,238,0.9), transparent)',
-                animation: 'top-beam 2.4s ease-in-out 0.3s both',
-              }}
-            />
+        .login-brand-panel::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+          background-size: 42px 42px;
+          mask-image: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.3));
+          z-index: -1;
+        }
+
+        .login-brand-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+
+        .login-logo-plate {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          padding: 9px 12px;
+          border-radius: 12px;
+          background: rgba(255,255,255,0.96);
+          box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+        }
+
+        .login-secure-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.86);
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .login-brand-copy {
+          max-width: 360px;
+          padding: 72px 0 64px;
+        }
+
+        .login-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 18px;
+          color: rgba(255,255,255,0.72);
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .login-brand-title {
+          margin: 0;
+          color: #fff;
+          font-size: clamp(34px, 4vw, 48px);
+          line-height: 1.02;
+          font-weight: 800;
+          letter-spacing: 0;
+        }
+
+        .login-brand-text {
+          margin: 18px 0 0;
+          max-width: 320px;
+          color: rgba(255,255,255,0.74);
+          font-size: 15px;
+          line-height: 1.65;
+        }
+
+        .login-signal-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .login-signal {
+          min-height: 94px;
+          padding: 14px;
+          border-radius: 14px;
+          border: 1px solid rgba(255,255,255,0.14);
+          background: rgba(255,255,255,0.09);
+          backdrop-filter: blur(10px);
+        }
+
+        .login-signal svg {
+          color: #AFC2FF;
+          margin-bottom: 12px;
+        }
+
+        .login-signal strong {
+          display: block;
+          font-size: 13px;
+          line-height: 1.25;
+          color: #fff;
+        }
+
+        .login-signal span {
+          display: block;
+          margin-top: 4px;
+          color: rgba(255,255,255,0.58);
+          font-size: 12px;
+          line-height: 1.35;
+        }
+
+        .login-form-panel {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 48px;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(39,73,147,0.07), transparent 34%),
+            ${T.surface};
+        }
+
+        .login-form-content {
+          width: 100%;
+          max-width: 410px;
+        }
+
+        .login-mobile-logo {
+          display: none;
+          margin-bottom: 28px;
+        }
+
+        .login-form-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 18px;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: ${BRAND_SOFT};
+          border: 1px solid ${BRAND_LINE};
+          color: ${BRAND};
+          font-size: 12px;
+          font-weight: 700;
+        }
+
+        .login-heading {
+          margin: 0;
+          color: ${T.navy};
+          font-size: clamp(30px, 3vw, 38px);
+          line-height: 1.08;
+          font-weight: 800;
+          letter-spacing: 0;
+        }
+
+        .login-subhead {
+          margin: 12px 0 30px;
+          color: ${T.muted};
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 17px;
+        }
+
+        .login-field {
+          animation: login-rise 0.48s ease both;
+        }
+
+        .login-field-label-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 22px;
+          margin-bottom: 7px;
+        }
+
+        .login-label {
+          color: ${T.mid};
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0;
+        }
+
+        .login-input-frame {
+          min-height: 54px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 0 14px;
+          border: 1.5px solid ${T.border};
+          border-radius: 14px;
+          background: ${T.inputBg};
+          transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+        }
+
+        .login-input-frame:focus-within {
+          border-color: ${BRAND};
+          background: #fff;
+          box-shadow: 0 0 0 4px rgba(39, 73, 147, 0.11);
+        }
+
+        .login-input-icon {
+          color: ${T.light};
+          flex-shrink: 0;
+        }
+
+        .login-ghost-button {
+          min-height: 34px;
+          padding: 0 8px;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: ${BRAND};
+          cursor: pointer;
+          font: inherit;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .login-icon-button {
+          width: 38px;
+          height: 38px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 0;
+          border-radius: 10px;
+          background: transparent;
+          color: ${T.light};
+          cursor: pointer;
+        }
+
+        .login-icon-button:hover,
+        .login-ghost-button:hover {
+          background: rgba(39,73,147,0.08);
+        }
+
+        .login-error {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 12px 14px;
+          border-radius: 14px;
+          background: rgba(239,68,68,0.06);
+          border: 1px solid rgba(239,68,68,0.22);
+          color: #B91C1C;
+          font-size: 14px;
+          line-height: 1.45;
+          animation: login-rise 0.24s ease both;
+        }
+
+        .login-submit {
+          min-height: 54px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          margin-top: 4px;
+          padding: 0 24px;
+          border: 0;
+          border-radius: 14px;
+          background: ${BRAND};
+          color: #fff;
+          cursor: pointer;
+          font: inherit;
+          font-size: 16px;
+          font-weight: 800;
+          box-shadow: 0 16px 34px rgba(39,73,147,0.24);
+          transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+        }
+
+        .login-submit:hover {
+          background: ${BRAND_DARK};
+          transform: translateY(-1px);
+          box-shadow: 0 20px 40px rgba(39,73,147,0.28);
+        }
+
+        .login-submit:disabled {
+          cursor: not-allowed;
+          opacity: 0.68;
+          transform: none;
+        }
+
+        .login-meta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 22px;
+          padding-top: 20px;
+          border-top: 1px solid ${T.border};
+          color: ${T.muted};
+          font-size: 12px;
+        }
+
+        .login-meta-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-height: 28px;
+          white-space: nowrap;
+        }
+
+        .login-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: #10B981;
+          box-shadow: 0 0 0 4px rgba(16,185,129,0.12);
+        }
+
+        @keyframes login-rise {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .login-shell,
+          .login-field,
+          .login-error {
+            animation: none;
+          }
+          .login-submit {
+            transition: none;
+          }
+        }
+
+        @media (max-width: 860px) {
+          .login-shell {
+            min-height: auto;
+            max-width: 520px;
+            grid-template-columns: 1fr;
+          }
+          .login-brand-panel {
+            display: none;
+          }
+          .login-form-panel {
+            padding: 34px 26px;
+          }
+          .login-mobile-logo {
+            display: inline-flex;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .login-shell {
+            border-radius: 20px;
+          }
+          .login-form-panel {
+            padding: 28px 20px;
+          }
+          .login-meta {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 8px;
+          }
+        }
+      `}</style>
+
+      <section className="login-brand-panel" aria-label="RingIQ staff access">
+        <div className="login-brand-top">
+          <div className="login-logo-plate">
+            <Image src="/assets/logo.png" alt="RingIQ" width={132} height={38} priority style={{ width: 132, height: 'auto' }} />
+          </div>
+          <div className="login-secure-pill">
+            <ShieldCheck size={14} />
+            Protected
+          </div>
+        </div>
+
+        <div className="login-brand-copy">
+          <div className="login-kicker">
+            <Activity size={15} />
+            Client Operations Console
+          </div>
+          <h1 className="login-brand-title">Quiet control for every rollout.</h1>
+          <p className="login-brand-text">
+            Staff access for onboarding practices, checking tenant details, and keeping the enrollment pipeline moving.
+          </p>
+        </div>
+
+        <div className="login-signal-grid" aria-label="Console status">
+          <div className="login-signal">
+            <CheckCircle2 size={19} />
+            <strong>Systems operational</strong>
+            <span>API, auth, and console routes are available.</span>
+          </div>
+          <div className="login-signal">
+            <KeyRound size={19} />
+            <strong>Session secured</strong>
+            <span>JWT access with protected staff routes.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="login-form-panel" aria-label="Sign in">
+        <div className="login-form-content">
+          <div className="login-mobile-logo">
+            <Image src="/assets/logo.png" alt="RingIQ" width={132} height={38} priority style={{ width: 132, height: 'auto' }} />
           </div>
 
-          {/* Subtle inner glow at top */}
-          <div
-            className="absolute inset-x-0 top-0 h-24 pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(ellipse 80% 100% at 50% -20%, rgba(34,211,238,0.06), transparent)',
-            }}
-          />
+          <div className="login-form-eyebrow">
+            <ShieldCheck size={14} />
+            Staff login
+          </div>
+          <h2 className="login-heading">Welcome back.</h2>
+          <p className="login-subhead">
+            Sign in with your staff credentials to continue to the RingIQ enrollment console.
+          </p>
 
-          <div className="px-7 pt-7 pb-6">
+          <form onSubmit={handleSubmit} className="login-form">
+            <FieldRow id="email" label="Email address" icon={Mail} delay={90}>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@ringiq.ai"
+                required
+                autoComplete="email"
+                style={inputStyle}
+              />
+            </FieldRow>
 
-            {/* ── Brand ── */}
-            <div
-              className="flex items-center gap-3 mb-7"
-              style={{ animation: 'fade-up .55s ease-out 80ms both' }}
-            >
-              <div
-                className="flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
-                style={{
-                  background: 'rgba(34,211,238,0.07)',
-                  border: '1px solid rgba(34,211,238,0.2)',
-                  animation: 'glow-pulse 3s ease-in-out infinite',
-                }}
-              >
-                <Zap size={16} className="text-cyan-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-bold tracking-tight text-white">RingIQ</span>
-                  <span
-                    className="text-[9px] font-bold tracking-[0.15em] px-1.5 py-0.5 rounded uppercase"
-                    style={{
-                      background: 'rgba(34,211,238,0.08)',
-                      border: '1px solid rgba(34,211,238,0.18)',
-                      color: 'rgba(34,211,238,0.85)',
-                    }}
-                  >
-                    Admin
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-600 font-mono mt-0.5">console v2.4</p>
-              </div>
-            </div>
-
-            {/* ── Heading ── */}
-            <div
-              className="mb-6"
-              style={{ animation: 'fade-up .55s ease-out 140ms both' }}
-            >
-              <h1
-                className="text-[22px] font-bold tracking-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 10%, rgba(255,255,255,0.6) 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Sign in to continue
-              </h1>
-              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                Enrollment Portal — Client Operations Console
-              </p>
-            </div>
-
-            {/* ── Form ── */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-
-              <FieldRow label="Email Address" icon={Mail} delay={190}>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@ringiq.ai"
-                  required
-                  className="flex-1 bg-transparent py-3 text-sm text-slate-100 placeholder:text-slate-600 outline-none"
-                  style={{ colorScheme: 'dark' }}
-                />
-              </FieldRow>
-
-              <FieldRow
-                label="Password"
-                icon={Lock}
-                delay={240}
-                right={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-[10px] text-slate-600 hover:text-slate-400 transition-colors"
-                  >
-                    {showPassword ? 'Hide' : 'Show'}
-                  </button>
-                }
-              >
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••"
-                  required
-                  className="flex-1 bg-transparent py-3 text-sm text-slate-100 placeholder:text-slate-600 outline-none"
-                  style={{ colorScheme: 'dark' }}
-                />
+            <FieldRow
+              id="password"
+              label="Password"
+              icon={Lock}
+              delay={150}
+              right={
                 <button
                   type="button"
+                  className="login-ghost-button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-slate-600 hover:text-slate-400 transition-colors shrink-0"
-                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff size={13} /> : <Eye size={13} />}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
-              </FieldRow>
-
-              {/* Error */}
-              {error && (
-                <div
-                  className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg text-xs"
-                  style={{
-                    background: 'rgba(239,68,68,0.06)',
-                    border: '1px solid rgba(239,68,68,0.18)',
-                    color: 'rgba(252,165,165,0.9)',
-                    animation: 'fade-up .3s ease-out both',
-                  }}
-                >
-                  <AlertCircle size={12} className="shrink-0 mt-0.5 text-red-400" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Submit button */}
-              <div
-                className="mt-0.5"
-                style={{ animation: 'fade-up .55s ease-out 290ms both' }}
+              }
+            >
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                autoComplete="current-password"
+                style={inputStyle}
+              />
+              <button
+                type="button"
+                className="login-icon-button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                tabIndex={-1}
               >
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="relative w-full overflow-hidden flex items-center justify-center gap-2 rounded-xl py-[11px] text-sm font-bold tracking-wide text-slate-950 transition-all duration-300 group disabled:opacity-60 disabled:cursor-not-allowed"
-                  style={{
-                    background: 'linear-gradient(135deg, #34d399 0%, #22d3ee 60%, #06b6d4 100%)',
-                    boxShadow: '0 0 28px rgba(6,182,212,0.22)',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading)
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                        '0 0 44px rgba(6,182,212,0.42)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                      '0 0 28px rgba(6,182,212,0.22)';
-                  }}
-                >
-                  {/* Shimmer sweep on hover */}
-                  <span
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    style={{
-                      background:
-                        'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.28) 50%, transparent 100%)',
-                      animation: 'shimmer-sweep 1.4s ease-in-out infinite',
-                    }}
-                    aria-hidden
-                  />
-                  <span className="relative z-10 flex items-center gap-2">
-                    {loading ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        Authenticating…
-                      </>
-                    ) : (
-                      <>
-                        Access Console
-                        <ArrowRight size={14} />
-                      </>
-                    )}
-                  </span>
-                </button>
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </FieldRow>
+
+            {error && (
+              <div className="login-error" role="alert">
+                <AlertCircle size={17} style={{ color: '#EF4444', flexShrink: 0, marginTop: 1 }} />
+                <span>{error}</span>
               </div>
+            )}
 
-            </form>
-          </div>
+            <button type="submit" disabled={loading} className="login-submit">
+              {loading ? (
+                <>
+                  <Loader2 size={17} style={{ animation: 'spin 1s linear infinite' }} />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Access console
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
 
-          {/* ── Footer bar ── */}
-          <div
-            className="flex items-center justify-between px-7 py-3 border-t border-slate-800/50"
-            style={{ background: 'rgba(2,6,23,0.5)' }}
-          >
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] text-slate-600 font-mono">All systems operational</span>
+          <div className="login-meta">
+            <div className="login-meta-item">
+              <span className="login-dot" />
+              Systems operational
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-slate-700">
-              <Shield size={10} />
-              <span className="font-mono">JWT · AES-256</span>
+            <div className="login-meta-item">
+              <ShieldCheck size={14} />
+              JWT secured
             </div>
           </div>
-
         </div>
-      </div>
-
-      {/* Below-card meta */}
-      <p
-        className="text-center text-[11px] text-slate-700 mt-5 font-mono tracking-wide"
-        style={{ animation: 'fade-up .55s ease-out 380ms both' }}
-      >
-        ringiq.ai · Enrollment Portal
-      </p>
+      </section>
     </div>
   );
 }

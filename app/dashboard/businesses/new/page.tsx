@@ -1,15 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import type { FieldPath } from 'react-hook-form';
 import {
   ArrowLeft, Check, CheckCircle2, ExternalLink,
-  Building2, Phone, MapPin, Bot,
+  Building2, Phone, MapPin, Bot, UserCheck, Loader2,
 } from 'lucide-react';
+
+type ProspectData = {
+  id: string;
+  practiceName: string;
+  contactName: string;
+  contactRole: string;
+  email: string;
+  phone: string;
+  city: string;
+  state: string;
+  plan: string;
+};
 
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { businessFormSchema, BusinessFormSchema } from '@/lib/schema';
@@ -68,39 +81,45 @@ const STEP_SCHEMAS = [
 
 function StepBar({ currentStep }: { currentStep: number }) {
   return (
-    <div className="flex items-center gap-0 px-8 py-3.5 border-b border-slate-800/50 bg-slate-950/40 shrink-0">
+    <div style={{
+      display: 'flex', alignItems: 'center', padding: '10px 32px',
+      borderBottom: '1px solid #E2E8F0', background: '#FFFFFF', flexShrink: 0,
+    }}>
       {STEPS.map((s, i) => {
         const done   = i < currentStep;
         const active = i === currentStep;
         const Icon   = s.icon;
         return (
-          <div key={s.id} className="flex items-center">
-            <div className="flex items-center gap-2.5 px-1">
-              <div className={cn(
-                'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all duration-300',
-                done   ? 'bg-emerald-500 text-slate-950' :
-                active ? 'bg-cyan-500 text-slate-950 shadow-[0_0_10px_rgba(6,182,212,0.4)]' :
-                         'bg-slate-800 text-slate-600 border border-slate-700/50',
-              )}>
+          <div key={s.id} style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, fontWeight: 700, transition: 'all 0.2s',
+                background: done ? '#10B981' : active ? '#274993' : '#F1F5F9',
+                color:      done || active ? '#fff' : '#94A3B8',
+                border:     done || active ? 'none' : '1.5px solid #E2E8F0',
+                boxShadow:  active ? '0 0 0 4px rgba(39,73,147,0.12)' : 'none',
+              }}>
                 {done ? <Check size={11} strokeWidth={3} /> : <Icon size={11} />}
               </div>
-              <span className={cn(
-                'text-xs font-medium whitespace-nowrap transition-colors duration-200',
-                active ? 'text-white' : done ? 'text-slate-400' : 'text-slate-600',
-              )}>
+              <span style={{
+                fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap',
+                color: active ? '#0F172A' : done ? '#274993' : '#94A3B8',
+              }}>
                 {s.shortLabel}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={cn(
-                'w-10 h-px mx-1 transition-colors duration-300',
-                done ? 'bg-emerald-500/35' : 'bg-slate-800',
-              )} />
+              <div style={{
+                width: 36, height: 1, margin: '0 4px',
+                background: done ? 'rgba(16,185,129,0.35)' : '#E2E8F0',
+              }} />
             )}
           </div>
         );
       })}
-      <div className="ml-auto text-[11px] text-slate-700 font-mono shrink-0">
+      <div style={{ marginLeft: 'auto', fontSize: 11, color: '#94A3B8', fontFamily: 'var(--font-geist-mono)', flexShrink: 0 }}>
         {currentStep + 1} / {STEPS.length}
       </div>
     </div>
@@ -111,22 +130,27 @@ function StepBar({ currentStep }: { currentStep: number }) {
 
 function SectionDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 my-6">
-      <div className="flex-1 h-px bg-slate-800/70" />
-      <span className="text-[10px] font-semibold tracking-widest uppercase text-slate-600">{label}</span>
-      <div className="flex-1 h-px bg-slate-800/70" />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0' }}>
+      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
+      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8' }}>{label}</span>
+      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
     </div>
   );
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function NewBusinessPage() {
-  const router  = useRouter();
-  const [mongoId, setMongoId] = useState('');
+function NewBusinessContent() {
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const prospectId   = searchParams.get('prospectId') ?? '';
+
+  const [mongoId,     setMongoId]     = useState('');
   const [step,        setStep]        = useState(0);
   const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [createdId,   setCreatedId]   = useState('');
+  const [prospect,    setProspect]    = useState<ProspectData | null>(null);
+  const [prospectLoading, setProspectLoading] = useState(false);
 
   const form = useForm<BusinessFormSchema>({
     resolver: zodResolver(businessFormSchema),
@@ -169,12 +193,33 @@ export default function NewBusinessPage() {
     mode: 'onSubmit',
   });
 
-  // Generate the preview ID client-side only — Math.random() causes hydration
-  // mismatch if called during SSR, which forces React to re-render the whole tree.
   useEffect(() => {
     const id = generateMongoId();
     setMongoId(id);
     form.setValue('mongoOfficeId', id);
+
+    if (!prospectId) return;
+    setProspectLoading(true);
+    fetch(`/api/queue/${prospectId}`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (!j.success || !j.prospect) return;
+        const p: ProspectData = j.prospect;
+        setProspect(p);
+        if (p.practiceName) {
+          form.setValue('practiceDisplayName', p.practiceName);
+          form.setValue('corporateCleanName',  p.practiceName);
+        }
+        if (p.phone) {
+          const digits = p.phone.replace(/\D/g, '');
+          if (digits.length === 10) form.setValue('publicNumber', `+1${digits}`);
+        }
+        if (p.city)  form.setValue('city',  p.city);
+        if (p.state) form.setValue('state', p.state);
+      })
+      .catch(() => {})
+      .finally(() => setProspectLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFinalSubmit = async (data: BusinessFormSchema) => {
@@ -187,6 +232,16 @@ export default function NewBusinessPage() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error ?? 'Unknown server error');
+
+      // Mark the queue prospect as approved now that setup is complete
+      if (prospectId) {
+        await fetch(`/api/queue/${prospectId}`, {
+          method:  'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ status: 'approved' }),
+        }).catch(() => {}); // non-critical
+      }
+
       setCreatedId(json.officeId);
       setSubmitState('success');
       toast.success('Business registered successfully.');
@@ -222,25 +277,25 @@ export default function NewBusinessPage() {
 
   if (submitState === 'success') {
     return (
-      <div className="flex h-screen bg-slate-950 overflow-hidden">
+      <div style={{ display: 'flex', height: '100vh', background: '#F7F6F3', overflow: 'hidden' }}>
         <Sidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-6 text-center max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-              <CheckCircle2 size={30} className="text-emerald-400" />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center', maxWidth: 380 }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle2 size={30} style={{ color: '#10B981' }} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Business Registered</h2>
-              <p className="text-sm text-slate-500 mt-1">Document created in MongoDB Atlas.</p>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', margin: 0 }}>Business Registered</h2>
+              <p style={{ fontSize: 13, color: '#64748B', marginTop: 6 }}>Document created in MongoDB Atlas.</p>
             </div>
-            <div className="w-full px-5 py-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-left">
-              <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 mb-1.5">MongoDB Office ID</p>
-              <div className="flex items-center gap-2 justify-between">
-                <span className="text-sm font-mono text-emerald-400 break-all">{createdId}</span>
-                <ExternalLink size={13} className="text-slate-600 shrink-0" />
+            <div style={{ width: '100%', padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)', background: 'rgba(16,185,129,0.04)', textAlign: 'left' }}>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 6 }}>MongoDB Office ID</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, fontFamily: 'var(--font-geist-mono)', color: '#10B981', wordBreak: 'break-all' }}>{createdId}</span>
+                <ExternalLink size={13} style={{ color: '#94A3B8', flexShrink: 0 }} />
               </div>
             </div>
-            <p className="text-xs text-slate-700">Redirecting to dashboard…</p>
+            <p style={{ fontSize: 12, color: '#94A3B8' }}>Redirecting to dashboard...</p>
           </div>
         </div>
       </div>
@@ -250,58 +305,97 @@ export default function NewBusinessPage() {
   // ── Main ─────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden">
+    <div style={{ display: 'flex', height: '100vh', background: '#F7F6F3', overflow: 'hidden' }}>
       <Sidebar />
 
-      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* Header */}
-        <header className="flex items-center gap-4 px-8 py-5 border-b border-slate-800/70 bg-slate-950/80 backdrop-blur-sm shrink-0">
+        <header style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '14px 32px', flexShrink: 0,
+          borderBottom: '1px solid #E2E8F0',
+          background: 'rgba(247,246,243,0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}>
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200
-              transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-800"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              fontSize: 13, color: '#64748B', background: 'none', border: 'none',
+              cursor: 'pointer', padding: '6px 10px', borderRadius: 8,
+              fontFamily: 'inherit', transition: 'all 0.12s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#F1F5F9'; (e.currentTarget as HTMLButtonElement).style.color = '#0F172A'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'none'; (e.currentTarget as HTMLButtonElement).style.color = '#64748B'; }}
           >
             <ArrowLeft size={15} />
             Back
           </button>
-          <div className="w-px h-5 bg-slate-800" />
+          <div style={{ width: 1, height: 20, background: '#E2E8F0' }} />
           <div>
-            <h1 className="text-base font-bold text-white tracking-tight">New Business Registration</h1>
-            <p className="text-xs text-slate-500 mt-0.5">{STEPS[step].subtitle}</p>
+            <h1 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
+              {prospect ? `Setup: ${prospect.practiceName}` : 'New Business Registration'}
+            </h1>
+            <p style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>{STEPS[step].subtitle}</p>
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-[11px] font-mono text-slate-700">ID:</span>
-            <span className="text-[11px] font-mono text-slate-600">{mongoId.slice(0, 12)}…</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: '#94A3B8' }}>ID:</span>
+            <span style={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: '#64748B' }}>{mongoId.slice(0, 12)}...</span>
           </div>
         </header>
 
         {/* Step bar */}
         <StepBar currentStep={step} />
 
-        {/* Form body */}
-        <main className="flex-1 min-h-0 overflow-hidden">
-          <div className={cn(
-            'h-full overflow-y-auto max-w-5xl mx-auto w-full px-10',
-            step === 3 ? 'py-5' : 'py-8',
-          )}>
+        {/* Prospect pre-fill banner */}
+        {prospectLoading && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 32px', background: '#EEF4FF', borderBottom: '1px solid #D8E5FF', flexShrink: 0 }}>
+            <Loader2 size={12} style={{ color: '#274993', animation: 'spin 1s linear infinite' }} />
+            <span style={{ fontSize: 12, color: '#274993' }}>Loading prospect data…</span>
+          </div>
+        )}
+        {prospect && !prospectLoading && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 32px', background: '#EEF4FF', borderBottom: '1px solid #D8E5FF', flexShrink: 0 }}>
+            <UserCheck size={13} style={{ color: '#274993', flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: '#274993', fontWeight: 600 }}>Pre-filled from queue</span>
+            <span style={{ fontSize: 12, color: '#64748B' }}>
+              · {prospect.contactName}{prospect.contactRole ? `, ${prospect.contactRole}` : ''}
+              {prospect.email ? ` · ${prospect.email}` : ''}
+            </span>
+            <a
+              href={`/dashboard/queue`}
+              style={{ marginLeft: 'auto', fontSize: 12, color: '#274993', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}
+            >
+              View original application →
+            </a>
+          </div>
+        )}
 
-            {/* Step title + progress line */}
-            <div className={step === 3 ? 'mb-4' : 'mb-7'}>
-              <h2 className="text-xl font-bold text-white tracking-tight">{STEPS[step].label}</h2>
-              <div className="mt-3 h-px bg-slate-800/60 relative overflow-hidden rounded-full">
-                <div
-                  className="absolute inset-y-0 left-0 bg-cyan-500/60 transition-all duration-500 rounded-full"
-                  style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-                />
+        {/* Form body */}
+        <main style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%', overflowY: 'auto',
+            maxWidth: 900, margin: '0 auto', width: '100%',
+            padding: step === 3 ? '20px 40px' : '32px 40px',
+          }}>
+            {/* Step title + progress */}
+            <div style={{ marginBottom: step === 3 ? 16 : 28 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>{STEPS[step].label}</h2>
+              <div style={{ marginTop: 12, height: 3, background: '#E2E8F0', borderRadius: 9, overflow: 'hidden', position: 'relative' }}>
+                <div style={{
+                  position: 'absolute', inset: '0 auto 0 0',
+                  background: '#274993', borderRadius: 9,
+                  width: `${((step + 1) / STEPS.length) * 100}%`,
+                  transition: 'width 0.5s ease',
+                }} />
               </div>
             </div>
 
             <form id="business-form" onSubmit={form.handleSubmit(handleFinalSubmit)}>
-
-              {/* Step 0: Practice Profile = Core + EHR + Phone Numbers */}
               {step === 0 && (
-                <div className="flex flex-col gap-5">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   <CoreBusinessSection form={form} />
                   <SectionDivider label="EHR Integration" />
                   <EHRMappingSection form={form} />
@@ -309,36 +403,38 @@ export default function NewBusinessPage() {
                   <TelephonySection form={form} />
                 </div>
               )}
-
-              {/* Step 1: Twilio Provisioning */}
               {step === 1 && <ProvisioningSection form={form} />}
-
-              {/* Step 2: VAPI AI Setup */}
               {step === 2 && <VapiSetupSection form={form} />}
-
-              {/* Step 3: Site & Schedule */}
               {step === 3 && <LocalizationSection form={form} />}
-
             </form>
           </div>
         </main>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-slate-800/60 bg-slate-950/80 px-8 py-4 flex items-center justify-between">
+        <div style={{
+          flexShrink: 0, borderTop: '1px solid #E2E8F0',
+          background: 'rgba(247,246,243,0.9)',
+          backdropFilter: 'blur(12px)',
+          padding: '14px 32px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
           <button
             type="button"
             onClick={() => router.push('/dashboard')}
-            className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
+            style={{ fontSize: 13, color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             Cancel
           </button>
-          <div className="flex items-center gap-3">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {step > 0 && (
               <button
                 type="button"
                 onClick={() => setStep(s => s - 1)}
-                className="px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-slate-200
-                  border border-slate-700/60 hover:border-slate-600 transition-all"
+                style={{
+                  padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                  color: '#64748B', background: '#FFFFFF', border: '1.5px solid #E2E8F0',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
               >
                 Back
               </button>
@@ -347,8 +443,13 @@ export default function NewBusinessPage() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-5 py-2 rounded-lg text-sm font-semibold bg-cyan-500 hover:bg-cyan-400
-                  text-slate-950 transition-all shadow-lg shadow-cyan-500/20"
+                style={{
+                  padding: '9px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600,
+                  background: '#274993', color: '#fff', border: 'none',
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  boxShadow: '0 4px 14px rgba(39,73,147,0.28)',
+                  letterSpacing: '-0.01em',
+                }}
               >
                 Continue →
               </button>
@@ -357,16 +458,22 @@ export default function NewBusinessPage() {
                 type="button"
                 disabled={submitState === 'loading'}
                 onClick={() => form.handleSubmit(handleFinalSubmit, () => {
-                  toast.error('Some required fields are missing — check all steps before submitting.');
+                  toast.error('Some required fields are missing. Check all steps before submitting.');
                 })()}
-                className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold
-                  bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all
-                  shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '9px 22px', borderRadius: 8, fontSize: 14, fontWeight: 600,
+                  background: submitState === 'loading' ? '#5B6E9E' : '#274993', color: '#fff', border: 'none',
+                  cursor: submitState === 'loading' ? 'not-allowed' : 'pointer',
+                  fontFamily: 'inherit', opacity: submitState === 'loading' ? 0.7 : 1,
+                  boxShadow: '0 4px 14px rgba(39,73,147,0.28)',
+                  letterSpacing: '-0.01em',
+                }}
               >
                 {submitState === 'loading' ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
-                    Creating…
+                    <div style={{ width: 13, height: 13, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                    Creating...
                   </>
                 ) : 'Register Business'}
               </button>
@@ -376,5 +483,17 @@ export default function NewBusinessPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function NewBusinessPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', height: '100vh', background: '#F7F6F3', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 size={24} style={{ color: '#274993', animation: 'spin 1s linear infinite' }} />
+      </div>
+    }>
+      <NewBusinessContent />
+    </Suspense>
   );
 }

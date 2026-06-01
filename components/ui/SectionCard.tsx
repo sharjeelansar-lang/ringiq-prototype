@@ -9,29 +9,41 @@ interface SectionCardProps {
   children: ReactNode;
 }
 
-export function SectionCard({ title, subtitle, icon: Icon, accentColor = 'cyan', children }: SectionCardProps) {
-  const accentMap: Record<string, string> = {
-    cyan: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20',
-    violet: 'text-violet-400 bg-violet-400/10 border-violet-400/20',
-    emerald: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    amber: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    rose: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
-  };
+const accentMap: Record<string, { bg: string; border: string; text: string }> = {
+  teal:    { bg: '#EEF4FF', border: '#D8E5FF', text: '#274993' },
+  cyan:    { bg: '#EEF4FF', border: '#D8E5FF', text: '#274993' },
+  violet:  { bg: '#F5F3FF', border: '#DDD6FE', text: '#7C3AED' },
+  emerald: { bg: '#ECFDF5', border: '#A7F3D0', text: '#059669' },
+  amber:   { bg: '#FFFBEB', border: '#FDE68A', text: '#D97706' },
+  rose:    { bg: '#FFF1F2', border: '#FECDD3', text: '#E11D48' },
+};
 
-  const accent = accentMap[accentColor] ?? accentMap.cyan;
+export function SectionCard({ title, subtitle, icon: Icon, accentColor = 'teal', children }: SectionCardProps) {
+  const accent = accentMap[accentColor] ?? accentMap.teal;
 
   return (
-    <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-800/60 bg-slate-900/40">
-        <div className={`flex items-center justify-center w-8 h-8 rounded-lg border ${accent}`}>
-          <Icon size={15} />
+    <div style={{
+      borderRadius: 12, border: '1px solid #E2E8F0',
+      background: '#FFFFFF', overflow: 'hidden',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '14px 20px', borderBottom: '1px solid #E2E8F0',
+        background: '#F8FAFC',
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+          background: accent.bg, border: `1px solid ${accent.border}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon size={15} style={{ color: accent.text }} />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
-          {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', margin: 0 }}>{title}</h3>
+          {subtitle && <p style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{subtitle}</p>}
         </div>
       </div>
-      <div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
         {children}
       </div>
     </div>

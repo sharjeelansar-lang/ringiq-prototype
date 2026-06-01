@@ -26,7 +26,7 @@ export function RadioCardGroup({ options, value, onChange, error }: RadioCardGro
           className={cn(
             'relative flex flex-col gap-1.5 p-4 rounded-lg border cursor-pointer transition-all duration-200 group',
             value === option.value
-              ? 'bg-cyan-500/8 border-cyan-500/50 shadow-[0_0_0_1px_rgba(6,182,212,0.2)]'
+              ? 'bg-[#274993]/8 border-[#274993]/50 shadow-[0_0_0_1px_rgba(39,73,147,0.18)]'
               : 'bg-slate-900/40 border-slate-700/40 hover:border-slate-600/60',
             error && 'border-red-500/50'
           )}
@@ -36,7 +36,7 @@ export function RadioCardGroup({ options, value, onChange, error }: RadioCardGro
               <span
                 className={cn(
                   'text-sm font-semibold transition-colors duration-200',
-                  value === option.value ? 'text-cyan-300' : 'text-slate-200'
+                  value === option.value ? 'text-[#8EA7F0]' : 'text-slate-200'
                 )}
               >
                 {option.label}
@@ -49,7 +49,7 @@ export function RadioCardGroup({ options, value, onChange, error }: RadioCardGro
               className={cn(
                 'w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all duration-200 flex items-center justify-center',
                 value === option.value
-                  ? 'border-cyan-400 bg-cyan-400'
+                  ? 'border-[#5B7BD8] bg-[#5B7BD8]'
                   : 'border-slate-600 bg-transparent'
               )}
             >

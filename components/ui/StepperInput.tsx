@@ -36,7 +36,7 @@ export function StepperInput({ value, onChange, min = 1, max = 5, error }: Stepp
         <Minus size={14} />
       </button>
       <div className="flex items-center justify-center w-14 h-10">
-        <span className="text-base font-bold text-cyan-400 font-mono tabular-nums">{value}</span>
+        <span className="text-base font-bold text-[#5B7BD8] font-mono tabular-nums">{value}</span>
       </div>
       <button
         type="button"

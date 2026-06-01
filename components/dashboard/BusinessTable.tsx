@@ -2,13 +2,23 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  CheckCircle2, Clock, Building2,
-  MoreVertical, Pencil, Trash2, Phone, X, Loader2,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Building2, MoreVertical, Pencil, Trash2, Phone, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MockBusiness } from '@/types/business';
-import { cn } from '@/lib/utils';
+
+const T = {
+  bg:      '#F7F6F3',
+  surface: '#FFFFFF',
+  border:  '#E2E8F0',
+  navy:    '#0F172A',
+  mid:     '#1E293B',
+  muted:   '#64748B',
+  light:   '#94A3B8',
+  teal:    '#274993',
+  tealFd:  '#EEF4FF',
+  tealBd:  '#D8E5FF',
+  hover:   '#F8FAFC',
+}
 
 // ── Delete modal ──────────────────────────────────────────────────────────────
 
@@ -23,67 +33,102 @@ function DeleteModal({
   const hasNumber = !!(business.twilioSid && business.inboundPhone);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={!loading ? onCancel : undefined} />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl shadow-black/60">
-        <div className="flex items-start justify-between p-6 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
-              <Trash2 size={18} className="text-red-400" />
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div
+        style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.25)', backdropFilter: 'blur(4px)' }}
+        onClick={!loading ? onCancel : undefined}
+      />
+      <div style={{
+        position: 'relative', zIndex: 10, width: '100%', maxWidth: 440,
+        borderRadius: 18, border: `1.5px solid ${T.border}`,
+        background: T.surface,
+        boxShadow: '0 20px 60px rgba(15,23,42,0.12)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '24px 24px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+              background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.18)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Trash2 size={18} style={{ color: '#EF4444' }} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Delete Business</h3>
-              <p className="text-xs text-slate-500 mt-0.5">This action cannot be undone</p>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: T.navy, margin: 0 }}>Delete Business</h3>
+              <p style={{ fontSize: 12, color: T.muted, marginTop: 3 }}>This action cannot be undone</p>
             </div>
           </div>
-          <button onClick={onCancel} disabled={loading}
-            className="text-slate-600 hover:text-slate-400 transition-colors disabled:opacity-40 ml-4 mt-0.5">
+          <button
+            onClick={onCancel} disabled={loading}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.light, display: 'flex', padding: 4, opacity: loading ? 0.4 : 1 }}
+          >
             <X size={16} />
           </button>
         </div>
 
-        <div className="px-6 pb-5">
-          <p className="text-sm text-slate-300 leading-relaxed">
+        <div style={{ padding: '0 24px 20px' }}>
+          <p style={{ fontSize: 14, color: T.mid, lineHeight: 1.6 }}>
             You are about to permanently remove{' '}
-            <span className="font-semibold text-white">{business.practiceDisplayName}</span>{' '}
+            <span style={{ fontWeight: 600, color: T.navy }}>{business.practiceDisplayName}</span>{' '}
             from the registry.
           </p>
           {hasNumber && (
-            <div className="mt-4 flex items-start gap-3 px-4 py-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5">
-              <Phone size={15} className="text-amber-400 shrink-0 mt-0.5" />
+            <div style={{
+              marginTop: 14, display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '12px 14px', borderRadius: 10,
+              border: '1px solid rgba(245,158,11,0.2)', background: 'rgba(245,158,11,0.04)',
+            }}>
+              <Phone size={14} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 1 }} />
               <div>
-                <p className="text-xs font-semibold text-amber-300 mb-0.5">Twilio number connected</p>
-                <p className="text-xs font-mono text-slate-300">{business.inboundPhone}</p>
-                <p className="text-xs text-slate-500 mt-1.5">Would you also like to release this number from Twilio?</p>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#B45309', marginBottom: 2 }}>Twilio number connected</p>
+                <p style={{ fontSize: 12, fontFamily: 'var(--font-geist-mono)', color: T.mid }}>{business.inboundPhone}</p>
+                <p style={{ fontSize: 12, color: T.muted, marginTop: 5 }}>Would you also like to release this number from Twilio?</p>
               </div>
             </div>
           )}
         </div>
 
-        <div className={cn(
-          'flex items-center gap-2.5 px-6 py-4 border-t border-slate-800/60',
-          hasNumber ? 'justify-between' : 'justify-end',
-        )}>
-          <button onClick={onCancel} disabled={loading}
-            className="px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-slate-200
-              border border-slate-700/60 hover:border-slate-600 transition-all disabled:opacity-40">
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '14px 24px', borderTop: `1px solid ${T.border}`,
+          justifyContent: hasNumber ? 'space-between' : 'flex-end',
+        }}>
+          <button
+            onClick={onCancel} disabled={loading}
+            style={{
+              padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+              color: T.muted, background: T.bg, border: `1.5px solid ${T.border}`,
+              cursor: 'pointer', opacity: loading ? 0.4 : 1, fontFamily: 'inherit',
+            }}
+          >
             Cancel
           </button>
-          <div className="flex items-center gap-2.5">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {hasNumber && (
-              <button type="button" onClick={() => onConfirm(false)} disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                  text-slate-300 border border-slate-700/60 hover:border-slate-600 hover:text-white
-                  transition-all disabled:opacity-40">
-                {loading ? <Loader2 size={13} className="animate-spin" /> : null}
+              <button
+                type="button" onClick={() => onConfirm(false)} disabled={loading}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                  color: T.mid, background: T.bg, border: `1.5px solid ${T.border}`,
+                  cursor: 'pointer', opacity: loading ? 0.4 : 1, fontFamily: 'inherit',
+                }}
+              >
+                {loading && <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />}
                 Delete without number
               </button>
             )}
-            <button type="button" onClick={() => onConfirm(hasNumber)} disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                bg-red-500 hover:bg-red-400 text-white transition-all
-                shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
-              {loading ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            <button
+              type="button" onClick={() => onConfirm(hasNumber)} disabled={loading}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                color: '#fff', background: '#EF4444', border: 'none',
+                cursor: 'pointer', opacity: loading ? 0.5 : 1,
+                boxShadow: '0 2px 8px rgba(239,68,68,0.25)', fontFamily: 'inherit',
+              }}
+            >
+              {loading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
               {hasNumber ? 'Delete with number' : 'Delete'}
             </button>
           </div>
@@ -100,14 +145,12 @@ interface BusinessTableProps {
   onDeleted?: () => void;
 }
 
-const COL = 'grid-cols-[1fr_1fr_130px_160px_110px_36px]';
-
 export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
   const router = useRouter();
-  const [openMenu,     setOpenMenu]     = useState<string | null>(null);
-  const [menuPos,      setMenuPos]      = useState<{ top: number; right: number } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<MockBusiness | null>(null);
-  const [deleteLoading,setDeleteLoading]= useState(false);
+  const [openMenu,      setOpenMenu]      = useState<string | null>(null);
+  const [menuPos,       setMenuPos]       = useState<{ top: number; right: number } | null>(null);
+  const [deleteTarget,  setDeleteTarget]  = useState<MockBusiness | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const openMenuHandler = (bizId: string, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -119,7 +162,6 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
       setOpenMenu(bizId);
     }
   };
-
   const closeMenu = () => { setOpenMenu(null); setMenuPos(null); };
 
   const handleDelete = async (deleteNumber: boolean) => {
@@ -141,32 +183,49 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
 
   const activeMenuBiz = openMenu ? businesses.find(b => b.id === openMenu) ?? null : null;
 
+  const COLS = '1fr 1fr 120px 150px 100px 36px';
+
   return (
     <>
-      {/* Backdrop closes the menu on outside click */}
-      {openMenu && <div className="fixed inset-0 z-40" onClick={closeMenu} />}
+      {openMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={closeMenu} />}
 
-      {/* Dropdown rendered outside overflow-hidden table — fixed to viewport */}
+      {/* Dropdown */}
       {activeMenuBiz && menuPos && (
-        <div
-          style={{ position: 'fixed', top: menuPos.top, right: menuPos.right }}
-          className="z-50 w-40 rounded-xl border border-slate-700/80 bg-slate-900 shadow-xl shadow-black/50 overflow-hidden py-1"
-        >
+        <div style={{
+          position: 'fixed', top: menuPos.top, right: menuPos.right,
+          zIndex: 50, width: 150,
+          borderRadius: 10, border: `1.5px solid ${T.border}`,
+          background: T.surface,
+          boxShadow: '0 8px 28px rgba(15,23,42,0.10)',
+          overflow: 'hidden', padding: '4px 0',
+        }}>
           <button
             type="button"
             onClick={() => { closeMenu(); router.push(`/dashboard/offices/${activeMenuBiz.mongoOfficeId}`); }}
-            className="flex items-center gap-2.5 w-full px-3.5 py-2 text-xs text-slate-300
-              hover:bg-slate-800/70 hover:text-white transition-colors"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+              padding: '9px 14px', fontSize: 13, color: T.mid,
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'left', fontFamily: 'inherit',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = T.hover}
+            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'none'}
           >
-            <Pencil size={12} className="text-slate-500" />
+            <Pencil size={12} style={{ color: T.light }} />
             Edit
           </button>
-          <div className="h-px bg-slate-800/60 mx-2" />
+          <div style={{ height: 1, background: T.border, margin: '2px 10px' }} />
           <button
             type="button"
             onClick={() => { closeMenu(); setDeleteTarget(activeMenuBiz); }}
-            className="flex items-center gap-2.5 w-full px-3.5 py-2 text-xs text-red-400
-              hover:bg-red-500/8 hover:text-red-300 transition-colors"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+              padding: '9px 14px', fontSize: 13, color: '#EF4444',
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'left', fontFamily: 'inherit',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.04)'}
+            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'none'}
           >
             <Trash2 size={12} />
             Delete
@@ -174,12 +233,15 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-800/60 bg-slate-900/30 overflow-hidden">
-
-        {/* Column headers */}
-        <div className={cn('grid gap-4 px-5 py-3 border-b border-slate-800/60 bg-slate-900/60', COL)}>
+      <div style={{ borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
+        {/* Header row */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: COLS, gap: 16,
+          padding: '10px 20px', borderBottom: `1px solid ${T.border}`,
+          background: T.bg,
+        }}>
           {['Practice Name', 'Clean Name', 'Status', 'Timezone', 'Created', ''].map(h => (
-            <span key={h} className="text-[10px] font-semibold tracking-widest uppercase text-slate-600">
+            <span key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.light }}>
               {h}
             </span>
           ))}
@@ -187,49 +249,72 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
 
         {/* Empty state */}
         {businesses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/40 flex items-center justify-center">
-              <Building2 size={22} className="text-slate-600" strokeWidth={1.5} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 24px', gap: 12 }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 12,
+              background: T.bg, border: `1px solid ${T.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Building2 size={22} style={{ color: T.light }} strokeWidth={1.5} />
             </div>
-            <p className="text-sm text-slate-600 font-medium">No businesses registered yet</p>
-            <p className="text-xs text-slate-700">Create your first business profile to get started</p>
+            <p style={{ fontSize: 14, fontWeight: 500, color: T.muted, margin: 0 }}>No businesses registered yet</p>
+            <p style={{ fontSize: 12, color: T.light, margin: 0 }}>Create your first business profile to get started</p>
           </div>
         ) : (
           businesses.map((biz, idx) => (
             <div
               key={biz.id}
               onClick={() => router.push(`/dashboard/offices/${biz.mongoOfficeId}`)}
-              className={cn(
-                `grid ${COL} gap-4 items-center px-5 py-3.5`,
-                'cursor-pointer group relative transition-all duration-150',
-                // Left accent border — the terminal precision differentiator
-                'border-l-2 border-l-transparent hover:border-l-cyan-500',
-                'hover:bg-slate-800/20',
-                idx !== businesses.length - 1 && 'border-b border-slate-800/40',
-              )}
+              style={{
+                display: 'grid', gridTemplateColumns: COLS, gap: 16,
+                alignItems: 'center', padding: '13px 20px',
+                cursor: 'pointer', transition: 'background 0.12s',
+                borderBottom: idx !== businesses.length - 1 ? `1px solid ${T.border}` : 'none',
+                borderLeft: '2.5px solid transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.background = T.hover;
+                (e.currentTarget as HTMLDivElement).style.borderLeftColor = T.teal;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                (e.currentTarget as HTMLDivElement).style.borderLeftColor = 'transparent';
+              }}
             >
-              {/* Practice name + ID */}
-              <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors">
+              {/* Practice name */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: T.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {biz.practiceDisplayName}
                 </span>
-                <span className="text-[10px] font-mono text-slate-700 truncate">{biz.mongoOfficeId}</span>
+                <span style={{ fontSize: 10, fontFamily: 'var(--font-geist-mono)', color: T.light, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {biz.mongoOfficeId}
+                </span>
               </div>
 
               {/* Clean name */}
-              <span className="text-xs font-mono text-slate-500 truncate">
-                {biz.corporateCleanName || <span className="text-slate-700 not-italic">—</span>}
+              <span style={{ fontSize: 12, fontFamily: 'var(--font-geist-mono)', color: T.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {biz.corporateCleanName || <span style={{ color: T.light }}>-</span>}
               </span>
 
               {/* Status badge */}
               <div>
                 {biz.environmentStatus === 'live_production' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+                    background: 'rgba(16,185,129,0.08)', color: '#059669',
+                    border: '1px solid rgba(16,185,129,0.2)',
+                  }}>
                     <CheckCircle2 size={10} />
                     Live
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+                    background: 'rgba(245,158,11,0.08)', color: '#D97706',
+                    border: '1px solid rgba(245,158,11,0.2)',
+                  }}>
                     <Clock size={10} />
                     Testing
                   </span>
@@ -237,22 +322,24 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
               </div>
 
               {/* Timezone */}
-              <span className="text-[11px] text-slate-500 font-mono truncate">{biz.timezone || '—'}</span>
+              <span style={{ fontSize: 11, color: T.muted, fontFamily: 'var(--font-geist-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {biz.timezone || '-'}
+              </span>
 
               {/* Created */}
-              <span className="text-[11px] text-slate-600">{biz.createdAt}</span>
+              <span style={{ fontSize: 11, color: T.light }}>{biz.createdAt}</span>
 
               {/* Actions */}
-              <div className="flex items-center justify-center">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <button
                   type="button"
                   onClick={(e) => openMenuHandler(biz.id, e)}
-                  className={cn(
-                    'w-6 h-6 flex items-center justify-center rounded-md transition-all',
-                    openMenu === biz.id
-                      ? 'bg-slate-700 text-slate-200'
-                      : 'text-slate-600 hover:text-slate-300 hover:bg-slate-800 opacity-0 group-hover:opacity-100',
-                  )}
+                  style={{
+                    width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: 6, background: openMenu === biz.id ? T.bg : 'none', border: 'none',
+                    cursor: 'pointer', color: openMenu === biz.id ? T.mid : T.light,
+                    transition: 'all 0.12s',
+                  }}
                 >
                   <MoreVertical size={14} />
                 </button>

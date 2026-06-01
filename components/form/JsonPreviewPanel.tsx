@@ -74,7 +74,7 @@ function JsonLine({ k, v, indent = 0, isLast = false }: { k?: string; v: JsonVal
 
   if (v === null) return <span className="text-slate-500">{pad}{k && <><span className="text-violet-400">&quot;{k}&quot;</span><span className="text-slate-500">: </span></>}<span className="text-rose-400">null</span>{!isLast && ','}</span>;
   if (typeof v === 'boolean') return <span>{pad}{k && <><span className="text-violet-400">&quot;{k}&quot;</span><span className="text-slate-500">: </span></>}<span className="text-amber-400">{String(v)}</span>{!isLast && ','}</span>;
-  if (typeof v === 'number') return <span>{pad}{k && <><span className="text-violet-400">&quot;{k}&quot;</span><span className="text-slate-500">: </span></>}<span className="text-cyan-400">{v}</span>{!isLast && ','}</span>;
+  if (typeof v === 'number') return <span>{pad}{k && <><span className="text-violet-400">&quot;{k}&quot;</span><span className="text-slate-500">: </span></>}<span className="text-[#5B7BD8]">{v}</span>{!isLast && ','}</span>;
   if (typeof v === 'string') return <span>{pad}{k && <><span className="text-violet-400">&quot;{k}&quot;</span><span className="text-slate-500">: </span></>}<span className="text-emerald-400">&quot;{v}&quot;</span>{!isLast && ','}</span>;
 
   if (Array.isArray(v)) {
@@ -116,7 +116,7 @@ export function JsonPreviewPanel({ data, mongoId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/60 bg-slate-900/50 flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <Code2 size={14} className="text-cyan-400" />
+          <Code2 size={14} className="text-[#5B7BD8]" />
           <span className="text-xs font-semibold tracking-widest uppercase text-slate-400">
             Tenant Schema Preview
           </span>
