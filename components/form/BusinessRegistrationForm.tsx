@@ -59,7 +59,7 @@ function StepItem({
         <div className={cn(
           'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 text-xs font-bold',
           done   ? 'bg-emerald-500 text-slate-950' :
-          active ? 'bg-cyan-500 text-slate-950 shadow-[0_0_14px_rgba(6,182,212,0.4)]' :
+          active ? 'bg-[#274993] text-white shadow-[0_0_14px_rgba(39,73,147,0.35)]' :
                    'bg-slate-800 text-slate-600 border border-slate-700/60',
         )}>
           {done ? <Check size={12} strokeWidth={3} /> : <Icon size={12} />}
@@ -196,8 +196,8 @@ export function BusinessRegistrationForm({ onClose, onSubmit }: Props) {
       <div className="w-64 shrink-0 bg-slate-900/60 border-r border-slate-800/60 flex flex-col px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-5 h-5 rounded bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center">
-              <Building2 size={10} className="text-cyan-400" />
+            <div className="w-5 h-5 rounded bg-[#274993]/15 border border-[#274993]/25 flex items-center justify-center">
+              <Building2 size={10} className="text-[#5B7BD8]" />
             </div>
             <span className="text-[11px] font-semibold text-slate-500 tracking-widest uppercase">New Business</span>
           </div>
@@ -248,7 +248,7 @@ export function BusinessRegistrationForm({ onClose, onSubmit }: Props) {
         {/* Progress bar */}
         <div className="shrink-0 mx-10 mt-6 mb-7 h-px bg-slate-800/80 relative overflow-hidden rounded-full">
           <div
-            className="absolute inset-y-0 left-0 bg-cyan-500 transition-all duration-500 ease-out rounded-full"
+            className="absolute inset-y-0 left-0 bg-[#274993] transition-all duration-500 ease-out rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -292,8 +292,8 @@ export function BusinessRegistrationForm({ onClose, onSubmit }: Props) {
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-5 py-2 rounded-lg text-sm font-semibold bg-cyan-500 hover:bg-cyan-400
-                  text-slate-950 transition-all shadow-lg shadow-cyan-500/20"
+                className="px-5 py-2 rounded-lg text-sm font-semibold bg-[#274993] hover:bg-[#1D3870]
+                  text-white transition-all shadow-lg shadow-[#274993]/20"
               >
                 Continue →
               </button>

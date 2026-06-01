@@ -11,7 +11,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
           'px-3 py-2 text-sm text-slate-100',
           'placeholder:text-slate-600',
           'transition-all duration-150',
-          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 focus-visible:border-cyan-500/50',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#274993]/45 focus-visible:border-[#274993]/50',
           'hover:border-slate-600',
           'disabled:cursor-not-allowed disabled:opacity-50',
           className

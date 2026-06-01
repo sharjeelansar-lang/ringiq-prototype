@@ -52,7 +52,7 @@ function DataRow({ label, value, mono = false }: { label: string; value?: string
       <div className="flex items-center gap-2 flex-1 justify-end min-w-0">
         <span className={cn(
           'text-right break-all leading-snug',
-          mono ? 'font-mono text-xs text-cyan-400/80' : 'text-xs text-slate-300',
+          mono ? 'font-mono text-xs text-[#8EA7F0]' : 'text-xs text-slate-300',
           display === '—' ? 'text-slate-700' : '',
         )}>
           {display}
@@ -73,7 +73,7 @@ function DataRow({ label, value, mono = false }: { label: string; value?: string
 // ── Panel ─────────────────────────────────────────────────────────────────────
 
 const ACCENT: Record<string, { icon: string; border: string; bg: string }> = {
-  cyan:    { icon: 'text-cyan-400',    border: 'border-cyan-500/20',    bg: 'bg-cyan-500/8' },
+  cyan:    { icon: 'text-[#5B7BD8]',    border: 'border-[#274993]/20',    bg: 'bg-[#274993]/8' },
   violet:  { icon: 'text-violet-400',  border: 'border-violet-500/20',  bg: 'bg-violet-500/8' },
   emerald: { icon: 'text-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/8' },
   amber:   { icon: 'text-amber-400',   border: 'border-amber-500/20',   bg: 'bg-amber-500/8' },
@@ -227,12 +227,12 @@ export default function OfficeDetailPage() {
               <div className="grid grid-cols-3 gap-3">
                 {/* Primary phone */}
                 <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-800/60 bg-slate-900/50">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/8 border border-cyan-500/20 shrink-0">
-                    <Phone size={14} className="text-cyan-400" />
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#274993]/8 border border-[#274993]/20 shrink-0">
+                    <Phone size={14} className="text-[#5B7BD8]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 mb-1">Inbound Line</p>
-                    <p className="text-sm font-mono text-cyan-400 font-semibold truncate">
+                    <p className="text-sm font-mono text-[#8EA7F0] font-semibold truncate">
                       {office.twilioNumbers?.[0]?.number || '—'}
                     </p>
                   </div>
@@ -320,7 +320,7 @@ export default function OfficeDetailPage() {
                     office.twilioNumbers.map((t, i) => (
                       <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-800/30 last:border-0">
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-xs font-mono text-cyan-400/80">{t.number}</span>
+                          <span className="text-xs font-mono text-[#8EA7F0]">{t.number}</span>
                           <span className="text-[10px] text-slate-500">{t.title}</span>
                         </div>
                         <div className="flex items-center gap-2">

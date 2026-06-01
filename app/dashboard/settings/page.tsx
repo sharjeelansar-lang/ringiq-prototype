@@ -8,7 +8,6 @@ import {
   Fingerprint, Pencil,
 } from 'lucide-react';
 import { Sidebar } from '@/components/dashboard/Sidebar';
-import { cn } from '@/lib/utils';
 
 interface UserProfile {
   userId: string;
@@ -18,6 +17,20 @@ interface UserProfile {
   phone:  string;
 }
 
+const T = {
+  bg:      '#F7F6F3',
+  surface: '#FFFFFF',
+  border:  '#E2E8F0',
+  navy:    '#0F172A',
+  mid:     '#1E293B',
+  muted:   '#64748B',
+  light:   '#94A3B8',
+  teal:    '#274993',
+  tealFd:  '#EEF4FF',
+  tealBd:  '#D8E5FF',
+  hover:   '#F8FAFC',
+};
+
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? 'A';
@@ -26,52 +39,93 @@ function initials(name: string) {
 
 function FieldLabel({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <label className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.13em] uppercase text-slate-500 mb-1.5">
-      <Icon size={9} className="text-slate-600 shrink-0" />
+    <label style={{
+      display: 'flex', alignItems: 'center', gap: 5,
+      fontSize: 10, fontWeight: 600, letterSpacing: '0.1em',
+      textTransform: 'uppercase', color: T.muted,
+      marginBottom: 6,
+    }}>
+      <Icon size={9} style={{ color: T.light, flexShrink: 0 }} />
       {children}
     </label>
   );
 }
 
-function inputCls(disabled: boolean) {
-  return cn(
-    'w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2',
-    'text-sm placeholder:text-slate-600 outline-none',
-    'transition-all duration-150',
-    disabled
-      ? 'text-slate-500 cursor-default opacity-50'
-      : 'text-slate-100 focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/10 hover:border-slate-700',
+function InputField({
+  value, onChange, placeholder, type = 'text', disabled = false,
+  suffix, required,
+}: {
+  value: string;
+  onChange?: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  disabled?: boolean;
+  suffix?: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 6,
+      background: disabled ? T.hover : T.surface,
+      border: `1.5px solid ${T.border}`,
+      borderRadius: 8, padding: '0 12px',
+      transition: 'border-color 0.15s',
+      opacity: disabled ? 0.7 : 1,
+    }}
+    onFocusCapture={e => { if (!disabled) (e.currentTarget as HTMLDivElement).style.borderColor = `${T.teal}80`; }}
+    onBlurCapture={e => { (e.currentTarget as HTMLDivElement).style.borderColor = T.border; }}
+    >
+      <input
+        type={type}
+        value={value}
+        onChange={onChange ? e => onChange(e.target.value) : undefined}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+        style={{
+          flex: 1, background: 'transparent', border: 'none', outline: 'none',
+          fontSize: 13, color: disabled ? T.muted : T.navy,
+          padding: '9px 0', fontFamily: 'inherit',
+          cursor: disabled ? 'default' : 'text',
+        }}
+      />
+      {suffix}
+    </div>
   );
 }
 
 function StatusPill({ type, msg }: { type: 'success' | 'error'; msg: string }) {
+  const isSuccess = type === 'success';
   return (
-    <div className={cn(
-      'flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium',
-      'animate-[fade-up_.25s_ease-out_both]',
-      type === 'success'
-        ? 'bg-emerald-500/6 border border-emerald-500/15 text-emerald-400'
-        : 'bg-red-500/6 border border-red-500/15 text-red-400',
-    )}>
-      {type === 'success' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 7,
+      padding: '8px 12px', borderRadius: 8, fontSize: 12, fontWeight: 500,
+      border: `1px solid ${isSuccess ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+      background: isSuccess ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)',
+      color: isSuccess ? '#059669' : '#DC2626',
+    }}>
+      {isSuccess ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
       {msg}
     </div>
   );
 }
 
-function CyanBtn({ loading, label, type = 'submit' }: { loading: boolean; label: string; type?: 'submit' | 'button' }) {
+function TealBtn({ loading, label, type = 'submit' }: { loading: boolean; label: string; type?: 'submit' | 'button' }) {
   return (
     <button
       type={type}
       disabled={loading}
-      className={cn(
-        'flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold',
-        'bg-cyan-500 hover:bg-cyan-400 text-slate-950',
-        'transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-      )}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+        background: '#274993', color: '#fff', border: 'none',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        opacity: loading ? 0.6 : 1,
+        boxShadow: '0 4px 14px rgba(39,73,147,0.25)',
+        fontFamily: 'inherit', transition: 'opacity 0.15s',
+      }}
     >
-      {loading ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+      {loading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <CheckCircle2 size={12} />}
       {loading ? 'Saving…' : label}
     </button>
   );
@@ -84,19 +138,30 @@ function Card({
   action?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col rounded-xl border border-slate-800/60 bg-slate-900/50 overflow-hidden h-full">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-800/50 shrink-0">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
-          style={{ background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.15)' }}>
-          <Icon size={14} className="text-cyan-400" />
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      borderRadius: 12, border: `1px solid ${T.border}`,
+      background: T.surface, overflow: 'hidden',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '14px 20px', borderBottom: `1px solid ${T.border}`,
+        background: T.hover, flexShrink: 0,
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+          background: T.tealFd, border: `1px solid ${T.tealBd}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon size={14} style={{ color: T.teal }} />
         </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-semibold text-white leading-none">{title}</h2>
-          <p className="text-[11px] text-slate-500 mt-1 leading-none truncate">{description}</p>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>{title}</h2>
+          <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>{description}</p>
         </div>
         {action}
       </div>
-      <div className="flex flex-col flex-1 px-5 py-4">{children}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px 20px' }}>{children}</div>
     </div>
   );
 }
@@ -104,13 +169,13 @@ function Card({
 export default function SettingsPage() {
   const router = useRouter();
 
-  const [profile,       setProfile]       = useState<UserProfile | null>(null);
-  const [name,          setName]          = useState('');
-  const [title,         setTitle]         = useState('');
-  const [phone,         setPhone]         = useState('');
-  const [isEditing,     setIsEditing]     = useState(false);
-  const [profileLoading,setProfileLoading]= useState(false);
-  const [profileStatus, setProfileStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const [profile,        setProfile]        = useState<UserProfile | null>(null);
+  const [name,           setName]           = useState('');
+  const [title,          setTitle]          = useState('');
+  const [phone,          setPhone]          = useState('');
+  const [isEditing,      setIsEditing]      = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileStatus,  setProfileStatus]  = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
   const [currentPw,   setCurrentPw]   = useState('');
   const [newPw,       setNewPw]       = useState('');
@@ -161,8 +226,8 @@ export default function SettingsPage() {
   const handlePasswordSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setPwStatus(null);
-    if (newPw !== confirmPw)   { setPwStatus({ type: 'error', msg: 'Passwords do not match' }); return; }
-    if (newPw.length < 8)      { setPwStatus({ type: 'error', msg: 'Min. 8 characters required' }); return; }
+    if (newPw !== confirmPw) { setPwStatus({ type: 'error', msg: 'Passwords do not match' }); return; }
+    if (newPw.length < 8)    { setPwStatus({ type: 'error', msg: 'Min. 8 characters required' }); return; }
     setPwLoading(true);
     try {
       const res  = await fetch('/api/auth/password', {
@@ -182,10 +247,10 @@ export default function SettingsPage() {
 
   if (!profile) {
     return (
-      <div className="flex h-screen bg-slate-950 overflow-hidden">
+      <div style={{ display: 'flex', height: '100vh', background: T.bg, overflow: 'hidden' }}>
         <Sidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader2 size={20} className="text-slate-600 animate-spin" />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Loader2 size={20} style={{ color: T.light, animation: 'spin 1s linear infinite' }} />
         </div>
       </div>
     );
@@ -194,58 +259,79 @@ export default function SettingsPage() {
   const avatarLabel = initials(name || 'Admin');
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden">
+    <div style={{ display: 'flex', height: '100vh', background: T.bg, overflow: 'hidden' }}>
       <Sidebar />
 
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, overflow: 'hidden' }}>
 
-        {/* ── Page header ── */}
-        <header className="flex items-center justify-between px-8 py-5 border-b border-slate-800/70 bg-slate-950/80 backdrop-blur-sm shrink-0">
+        {/* Header */}
+        <header style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '18px 32px', borderBottom: `1px solid ${T.border}`,
+          background: 'rgba(247,246,243,0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          flexShrink: 0,
+        }}>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">Settings</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Manage your account and credentials</p>
+            <h1 style={{ fontSize: 18, fontWeight: 700, color: T.navy, letterSpacing: '-0.02em', margin: 0 }}>Settings</h1>
+            <p style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>Manage your account and credentials</p>
           </div>
-          <div className="flex items-center gap-1.5 text-[10px] text-slate-700 font-mono">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>
             <Shield size={10} />
             <span>JWT · AES-256</span>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="flex flex-col gap-4 h-full">
+        <main style={{ flex: 1, overflowY: 'auto', padding: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* ── Identity strip ── */}
-            <div className="flex items-center gap-4 px-5 py-3.5 rounded-xl border border-slate-800/60 bg-slate-900/50 shrink-0">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0 select-none"
-                style={{ background: 'linear-gradient(135deg, #22d3ee 0%, #818cf8 100%)' }}
-              >
+            {/* Identity strip */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '12px 20px', borderRadius: 12,
+              border: `1px solid ${T.border}`, background: T.surface,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14, fontWeight: 700, color: '#fff', userSelect: 'none',
+                background: `linear-gradient(135deg, ${T.teal} 0%, #18336F 100%)`,
+              }}>
                 {avatarLabel}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate leading-none">{name || 'Admin'}</p>
-                <p className="text-xs text-slate-500 mt-1 truncate leading-none">{profile.email}</p>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: T.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+                  {name || 'Admin'}
+                </p>
+                <p style={{ fontSize: 12, color: T.muted, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {profile.email}
+                </p>
               </div>
               {title && (
-                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/60 border border-slate-700/40">
-                  <Briefcase size={10} className="text-slate-500" />
-                  <span className="text-[11px] text-slate-400 font-medium">{title}</span>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '4px 10px', borderRadius: 6,
+                  background: T.hover, border: `1px solid ${T.border}`,
+                }}>
+                  <Briefcase size={10} style={{ color: T.muted }} />
+                  <span style={{ fontSize: 11, color: T.muted, fontWeight: 500 }}>{title}</span>
                 </div>
               )}
-              <div className="w-px h-6 bg-slate-800 shrink-0" />
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] text-emerald-400 font-medium font-mono">Active</span>
+              <div style={{ width: 1, height: 24, background: T.border, flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'block' }} />
+                <span style={{ fontSize: 10, color: '#059669', fontWeight: 500, fontFamily: 'var(--font-geist-mono)' }}>Active</span>
               </div>
-              <div className="flex items-center gap-1.5 text-slate-700 shrink-0">
-                <Fingerprint size={14} />
+              <div style={{ flexShrink: 0 }}>
+                <Fingerprint size={14} style={{ color: T.light }} />
               </div>
             </div>
 
-            {/* ── Two-column cards ── */}
-            <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+            {/* Two-column cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
-              {/* ── Profile card ── */}
+              {/* Profile card */}
               <Card
                 title="Profile Information"
                 description="Update display name, title, and contact"
@@ -255,148 +341,142 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
-                      className={cn(
-                        'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium shrink-0',
-                        'text-slate-400 border border-slate-700/40',
-                        'hover:border-slate-600 hover:text-slate-200 transition-all',
-                      )}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 5,
+                        padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 500,
+                        color: T.muted, background: T.surface, border: `1.5px solid ${T.border}`,
+                        cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, transition: 'all 0.12s',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.teal; (e.currentTarget as HTMLButtonElement).style.color = T.teal; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.border; (e.currentTarget as HTMLButtonElement).style.color = T.muted; }}
                     >
                       <Pencil size={11} />
-                      Edit Profile
+                      Edit
                     </button>
                   ) : (
                     <button
-                      type="button"
-                      onClick={cancelEdit}
-                      className="text-xs text-slate-500 hover:text-slate-300 transition-colors shrink-0 px-2"
+                      type="button" onClick={cancelEdit}
+                      style={{ fontSize: 12, color: T.muted, background: 'none', border: 'none', cursor: 'pointer', padding: '0 8px', fontFamily: 'inherit', flexShrink: 0 }}
                     >
                       Cancel
                     </button>
                   )
                 }
               >
-                <form onSubmit={handleProfileSave} className="flex flex-col flex-1 gap-3">
-                  <div className="grid grid-cols-2 gap-3">
+                <form onSubmit={handleProfileSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 12 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
                       <FieldLabel icon={User}>Display Name</FieldLabel>
-                      <input
-                        className={inputCls(!isEditing)}
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        placeholder="Jane Smith"
-                        disabled={!isEditing}
-                        required
-                      />
+                      <InputField value={name} onChange={isEditing ? setName : undefined} placeholder="Jane Smith" disabled={!isEditing} required />
                     </div>
                     <div>
                       <FieldLabel icon={Briefcase}>Job Title</FieldLabel>
-                      <input
-                        className={inputCls(!isEditing)}
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
-                        placeholder="Operations Manager"
-                        disabled={!isEditing}
-                      />
+                      <InputField value={title} onChange={isEditing ? setTitle : undefined} placeholder="Operations Manager" disabled={!isEditing} />
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
                       <FieldLabel icon={Phone}>Phone Number</FieldLabel>
-                      <input
-                        className={inputCls(!isEditing)}
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        placeholder="+1 (555) 000-0000"
-                        type="tel"
-                        disabled={!isEditing}
-                      />
+                      <InputField value={phone} onChange={isEditing ? setPhone : undefined} placeholder="+1 (555) 000-0000" type="tel" disabled={!isEditing} />
                     </div>
                     <div>
                       <FieldLabel icon={Mail}>Email Address</FieldLabel>
-                      <div className={cn(inputCls(true), 'flex items-center gap-2')}>
-                        <span className="flex-1 truncate text-sm">{profile.email}</span>
-                        <span className="shrink-0 text-[9px] font-semibold tracking-widest uppercase px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-600 border border-slate-700/40">
-                          Read-only
-                        </span>
-                      </div>
+                      <InputField
+                        value={profile.email} disabled
+                        suffix={
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                            padding: '2px 6px', borderRadius: 4, flexShrink: 0,
+                            background: T.hover, border: `1px solid ${T.border}`, color: T.light,
+                          }}>
+                            Read-only
+                          </span>
+                        }
+                      />
                     </div>
                   </div>
 
-                  <div className="flex-1" />
+                  <div style={{ flex: 1 }} />
                   {profileStatus && <StatusPill type={profileStatus.type} msg={profileStatus.msg} />}
 
-                  <div className="flex justify-end pt-1 border-t border-slate-800/40">
-                    <div className={cn('transition-opacity duration-150', isEditing ? 'opacity-100' : 'opacity-0 pointer-events-none')}>
-                      <CyanBtn loading={profileLoading} label="Save Changes" />
-                    </div>
+                  <div style={{
+                    display: 'flex', justifyContent: 'flex-end', paddingTop: 8,
+                    borderTop: `1px solid ${T.border}`,
+                    opacity: isEditing ? 1 : 0, pointerEvents: isEditing ? 'auto' : 'none',
+                    transition: 'opacity 0.15s',
+                  }}>
+                    <TealBtn loading={profileLoading} label="Save Changes" />
                   </div>
                 </form>
               </Card>
 
-              {/* ── Password card ── */}
+              {/* Password card */}
               <Card
                 title="Change Password"
                 description="Requires your current password to confirm"
                 icon={KeyRound}
               >
-                <form onSubmit={handlePasswordSave} className="flex flex-col flex-1 gap-3">
+                <form onSubmit={handlePasswordSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 12 }}>
                   <div>
                     <FieldLabel icon={Lock}>Current Password</FieldLabel>
-                    <div className={cn(inputCls(false), 'flex items-center gap-1 p-0! overflow-hidden')}>
-                      <input
-                        type={showCurrent ? 'text' : 'password'}
-                        className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none"
-                        value={currentPw}
-                        onChange={e => setCurrentPw(e.target.value)}
-                        placeholder="Enter current password"
-                        required
-                      />
-                      <button type="button" onClick={() => setShowCurrent(v => !v)} tabIndex={-1}
-                        className="px-3 text-slate-600 hover:text-slate-400 transition-colors shrink-0">
-                        {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
-                      </button>
-                    </div>
+                    <InputField
+                      value={currentPw} onChange={setCurrentPw}
+                      placeholder="Enter current password"
+                      type={showCurrent ? 'text' : 'password'}
+                      required
+                      suffix={
+                        <button type="button" onClick={() => setShowCurrent(v => !v)} tabIndex={-1}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.light, display: 'flex', padding: 4, flexShrink: 0 }}>
+                          {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
+                        </button>
+                      }
+                    />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
                       <FieldLabel icon={Lock}>New Password</FieldLabel>
-                      <div className={cn(inputCls(false), 'flex items-center gap-1 p-0! overflow-hidden')}>
-                        <input
-                          type={showNew ? 'text' : 'password'}
-                          className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none"
-                          value={newPw}
-                          onChange={e => setNewPw(e.target.value)}
-                          placeholder="Min. 8 chars"
-                          required
-                        />
-                        <button type="button" onClick={() => setShowNew(v => !v)} tabIndex={-1}
-                          className="px-3 text-slate-600 hover:text-slate-400 transition-colors shrink-0">
-                          {showNew ? <EyeOff size={13} /> : <Eye size={13} />}
-                        </button>
-                      </div>
+                      <InputField
+                        value={newPw} onChange={setNewPw}
+                        placeholder="Min. 8 chars"
+                        type={showNew ? 'text' : 'password'}
+                        required
+                        suffix={
+                          <button type="button" onClick={() => setShowNew(v => !v)} tabIndex={-1}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.light, display: 'flex', padding: 4, flexShrink: 0 }}>
+                            {showNew ? <EyeOff size={13} /> : <Eye size={13} />}
+                          </button>
+                        }
+                      />
                     </div>
                     <div>
                       <FieldLabel icon={Lock}>Confirm Password</FieldLabel>
-                      <input
-                        type="password"
-                        className={cn(
-                          inputCls(false),
-                          confirmPw && confirmPw !== newPw ? 'border-red-500/35' : '',
-                        )}
-                        value={confirmPw}
-                        onChange={e => setConfirmPw(e.target.value)}
-                        placeholder="Repeat new password"
-                        required
-                      />
+                      <div style={{
+                        background: T.surface, border: `1.5px solid ${confirmPw && confirmPw !== newPw ? '#FCA5A5' : T.border}`,
+                        borderRadius: 8,
+                      }}
+                      onFocusCapture={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${T.teal}80`; }}
+                      onBlurCapture={e => { (e.currentTarget as HTMLDivElement).style.borderColor = confirmPw && confirmPw !== newPw ? '#FCA5A5' : T.border; }}
+                      >
+                        <input
+                          type="password" value={confirmPw}
+                          onChange={e => setConfirmPw(e.target.value)}
+                          placeholder="Repeat new password"
+                          required
+                          style={{
+                            width: '100%', background: 'transparent', border: 'none', outline: 'none',
+                            fontSize: 13, color: T.navy, padding: '9px 12px',
+                            fontFamily: 'inherit', boxSizing: 'border-box',
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex-1" />
+                  <div style={{ flex: 1 }} />
                   {pwStatus && <StatusPill type={pwStatus.type} msg={pwStatus.msg} />}
-                  <div className="flex justify-end pt-1 border-t border-slate-800/40">
-                    <CyanBtn loading={pwLoading} label="Update Password" />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8, borderTop: `1px solid ${T.border}` }}>
+                    <TealBtn loading={pwLoading} label="Update Password" />
                   </div>
                 </form>
               </Card>

@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RingIQ — Client Enrollment Portal",
   description: "Automated client enrollment and business registration console",
+  icons: {
+    icon: '/assets/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -28,17 +31,18 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="h-full bg-slate-950 text-slate-100">
+      <body className="h-full" suppressHydrationWarning>
         {children}
         <Toaster
-          theme="dark"
+          theme="light"
           position="bottom-right"
           toastOptions={{
             style: {
-              background: '#0f172a',
-              border: '1px solid rgba(148,163,184,0.12)',
-              color: '#f1f5f9',
+              background: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              color: '#0F172A',
               fontFamily: 'var(--font-geist-sans)',
+              boxShadow: '0 4px 20px rgba(15,23,42,0.08)',
             },
           }}
         />
