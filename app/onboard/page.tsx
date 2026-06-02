@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import {
   ArrowRight, ArrowLeft, Check, Loader2, CheckCircle2,
-  ChevronDown, Clock, Calendar, PhoneCall, Zap, DollarSign, Shield, X,
+  ChevronDown, Clock, Calendar, PhoneCall, Zap, DollarSign, Shield, X, Mic,
 } from 'lucide-react';
 
 // ── Brand tokens ──────────────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ const CSS = `
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 36px 36px 30px;
+    padding: 28px 32px 24px;
     background: linear-gradient(145deg, #274993 0%, #1D3870 52%, #0F172A 100%);
     color: #fff;
     isolation: isolate;
@@ -80,52 +80,58 @@ const CSS = `
     border-radius: 11px;
     background: rgba(255,255,255,0.95);
     box-shadow: 0 8px 24px rgba(15,23,42,0.18);
-    margin-bottom: 32px;
+    margin-bottom: 22px;
   }
 
-  .ob-left-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .ob-left-body {
+    flex: 1; display: flex; flex-direction: column; min-height: 0;
+    overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .ob-left-body::-webkit-scrollbar { display: none; }
 
   .ob-kicker {
     display: inline-flex; align-items: center; gap: 7px;
-    padding: 6px 11px; border-radius: 999px;
+    padding: 5px 10px; border-radius: 999px;
     border: 1px solid rgba(255,255,255,0.15);
     background: rgba(255,255,255,0.09);
     color: rgba(255,255,255,0.78);
-    font-size: 12px; font-weight: 600; margin-bottom: 14px;
+    font-size: 12px; font-weight: 600; margin-bottom: 10px;
   }
   .ob-left-title {
-    margin: 0 0 10px;
-    font-size: 24px; line-height: 1.18; font-weight: 800;
+    margin: 0 0 8px;
+    font-size: 22px; line-height: 1.18; font-weight: 800;
     letter-spacing: -0.03em; color: #fff;
   }
   .ob-left-sub {
-    margin: 0 0 24px;
-    font-size: 13px; line-height: 1.65;
+    margin: 0 0 16px;
+    font-size: 12.5px; line-height: 1.6;
     color: rgba(255,255,255,0.56);
   }
 
-  .ob-benefits { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
-  .ob-benefit  { display: flex; align-items: center; gap: 11px; }
+  .ob-benefits { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .ob-benefit  { display: flex; align-items: center; gap: 10px; }
   .ob-benefit-icon {
-    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
     background: rgba(13,148,136,0.12);
     border: 1px solid rgba(13,148,136,0.22);
     display: flex; align-items: center; justify-content: center;
   }
-  .ob-benefit-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; }
+  .ob-benefit-text { font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.4; }
 
   /* Live call */
   .ob-call {
-    border-radius: 14px;
+    border-radius: 12px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
-    padding: 15px 17px;
-    margin-bottom: 24px;
+    padding: 12px 14px;
+    margin-top: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
   }
-  .ob-call-header { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; }
+  .ob-call-header { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
   .ob-call-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #10B981; box-shadow: 0 0 8px rgba(16,185,129,0.6);
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #10B981; box-shadow: 0 0 6px rgba(16,185,129,0.6);
   }
   .ob-call-lbl {
     font-size: 10px; font-weight: 600;
@@ -133,46 +139,46 @@ const CSS = `
     letter-spacing: 0.07em; text-transform: uppercase;
   }
   .ob-bubble-p {
-    background: rgba(255,255,255,0.08); border-radius: 8px;
-    padding: 7px 11px; font-size: 12px;
-    color: rgba(255,255,255,0.62); line-height: 1.4; margin-bottom: 7px;
+    background: rgba(255,255,255,0.08); border-radius: 7px;
+    padding: 6px 10px; font-size: 11.5px;
+    color: rgba(255,255,255,0.62); line-height: 1.4; margin-bottom: 6px;
   }
   .ob-bubble-i {
     background: rgba(13,148,136,0.12);
     border: 1px solid rgba(13,148,136,0.22);
-    border-radius: 8px; padding: 7px 11px;
-    font-size: 12px; color: rgba(255,255,255,0.85);
-    line-height: 1.4; margin-bottom: 8px;
+    border-radius: 7px; padding: 6px 10px;
+    font-size: 11.5px; color: rgba(255,255,255,0.85);
+    line-height: 1.4; margin-bottom: 7px;
   }
   .ob-call-confirm { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #10B981; }
 
   /* Step timeline */
-  .ob-timeline { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 18px; }
+  .ob-timeline { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 14px; flex-shrink: 0; }
   .ob-tl-hd {
     font-size: 10px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; color: rgba(255,255,255,0.24); margin-bottom: 13px;
+    letter-spacing: 0.1em; color: rgba(255,255,255,0.24); margin-bottom: 10px;
   }
   .ob-tl-list { display: flex; flex-direction: column; gap: 0; }
-  .ob-tl-row  { display: flex; align-items: flex-start; gap: 12px; position: relative; }
+  .ob-tl-row  { display: flex; align-items: flex-start; gap: 10px; position: relative; }
   .ob-tl-row:not(:last-child)::after {
     content: "";
-    position: absolute; left: 10px; top: 22px;
+    position: absolute; left: 9px; top: 20px;
     width: 1px; height: calc(100% + 2px);
     background: rgba(255,255,255,0.1);
   }
   .ob-tl-row.done::after  { background: rgba(13,148,136,0.35); }
 
   .ob-tl-node {
-    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 14px;
+    font-size: 9px; font-weight: 700; color: #fff; margin-bottom: 10px;
     transition: all 0.25s ease;
   }
   .ob-tl-node.done    { background: ${TEAL}; box-shadow: 0 0 0 3px rgba(13,148,136,0.2); }
-  .ob-tl-node.active  { background: ${BRAND}; box-shadow: 0 0 0 4px rgba(39,73,147,0.25); }
+  .ob-tl-node.active  { background: ${BRAND}; box-shadow: 0 0 0 3px rgba(39,73,147,0.25); }
   .ob-tl-node.pending { background: transparent; border: 1.5px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.32); }
 
-  .ob-tl-txt { font-size: 12px; padding-top: 4px; line-height: 1.3; transition: color 0.25s ease; }
+  .ob-tl-txt { font-size: 11.5px; padding-top: 3px; line-height: 1.3; transition: color 0.25s ease; }
   .ob-tl-txt.done    { color: rgba(255,255,255,0.38); }
   .ob-tl-txt.active  { color: rgba(255,255,255,0.92); font-weight: 600; }
   .ob-tl-txt.pending { color: rgba(255,255,255,0.2); }
@@ -180,19 +186,19 @@ const CSS = `
   /* ── Right panel ── */
   .ob-right {
     display: flex; align-items: flex-start; justify-content: center;
-    min-height: 100dvh; padding: 60px 48px;
+    min-height: 100dvh; padding: 52px 72px;
     background:
       radial-gradient(circle at 100% 0%, rgba(39,73,147,0.06), transparent 36%),
       #FFFFFF;
   }
-  .ob-form-content { width: 100%; max-width: 520px; padding-top: 4px; }
+  .ob-form-content { width: 100%; max-width: 680px; padding-top: 4px; }
 
   .ob-mobile-logo { display: none; margin-bottom: 28px; }
 
   /* Progress bar */
   .ob-prog-track {
     height: 3px; border-radius: 999px;
-    background: ${T.border}; margin-bottom: 36px; overflow: hidden;
+    background: ${T.border}; margin-bottom: 24px; overflow: hidden;
   }
   .ob-prog-fill {
     height: 100%; border-radius: 999px;
@@ -230,14 +236,15 @@ const CSS = `
     color: ${T.navy}; line-height: 1.1; letter-spacing: -0.03em;
   }
   .ob-step-sub {
-    margin: 10px 0 28px; font-size: 14px;
+    margin: 8px 0 16px; font-size: 14px;
     color: ${T.muted}; line-height: 1.6;
   }
 
   /* Fields */
-  .ob-fields { display: flex; flex-direction: column; gap: 18px; animation: ob-rise 0.35s ease both; }
+  .ob-fields { display: flex; flex-direction: column; gap: 14px; animation: ob-rise 0.35s ease both; }
   .ob-row-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .ob-row-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  .ob-row-3   { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; }
 
   .ob-label { display: block; font-size: 13px; font-weight: 700; color: ${T.mid}; margin-bottom: 7px; }
   .ob-field-err { margin-top: 5px; font-size: 12px; color: #DC2626; font-weight: 500; }
@@ -256,6 +263,7 @@ const CSS = `
   .ob-frame.err  { border-color: #EF4444; }
   .ob-frame.err:focus-within { border-color: #EF4444; box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
   .ob-frame.textarea { align-items: flex-start; min-height: 92px; }
+  .ob-frame.dimmed   { opacity: 0.3; pointer-events: none; }
 
   .ob-input {
     flex: 1; min-width: 0; height: 50px;
@@ -337,7 +345,7 @@ const CSS = `
   }
   .ob-nav {
     display: flex; justify-content: space-between; align-items: center;
-    margin-top: 32px; padding-top: 24px; border-top: 1px solid ${T.border};
+    margin-top: 20px; padding-top: 18px; border-top: 1px solid ${T.border};
   }
   .ob-btn-back {
     display: inline-flex; align-items: center; gap: 7px;
@@ -359,7 +367,7 @@ const CSS = `
   .ob-btn-next:hover { background: ${BRAND_DARK}; transform: translateY(-1px); box-shadow: 0 20px 42px rgba(39,73,147,0.28); }
   .ob-btn-next:disabled { cursor: not-allowed; opacity: 0.65; transform: none; }
 
-  .ob-footnote { margin-top: 20px; font-size: 12px; color: ${T.light}; text-align: center; line-height: 1.5; }
+  .ob-footnote { margin-top: 12px; font-size: 12px; color: ${T.light}; text-align: center; line-height: 1.5; }
 
   /* ── Success screen ── */
   .ob-succ-shell {
@@ -427,6 +435,53 @@ const CSS = `
   }
   .ob-succ-cta:hover { background: ${BRAND_DARK}; transform: translateY(-1px); box-shadow: 0 20px 42px rgba(39,73,147,0.28); }
 
+  /* ── Voice cards ── */
+  .ob-voice-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ob-voice-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 12px; border-radius: 12px;
+    border: 1.5px solid ${T.border}; background: ${T.inputBg};
+    cursor: pointer; font-family: inherit; text-align: left;
+    transition: all 0.15s ease;
+  }
+  .ob-voice-card.on { border-color: ${BRAND}; background: ${BRAND_SOFT}; box-shadow: 0 0 0 3px rgba(39,73,147,0.08); }
+  .ob-voice-radio {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid ${T.border}; background: transparent;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .ob-voice-card.on .ob-voice-radio { border-color: ${BRAND}; background: ${BRAND}; }
+  .ob-voice-name { font-size: 14px; font-weight: 700; color: ${T.navy}; transition: color 0.15s; margin-bottom: 2px; }
+  .ob-voice-card.on .ob-voice-name { color: ${BRAND}; }
+  .ob-voice-tone { font-size: 10px; font-weight: 700; color: ${TEAL}; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .ob-voice-desc { font-size: 12px; color: ${T.muted}; line-height: 1.4; }
+  .ob-voice-icon {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: ${T.bg}; border: 1px solid ${T.border}; transition: all 0.15s; margin-left: auto;
+  }
+  .ob-voice-card.on .ob-voice-icon { background: ${BRAND}; border-color: ${BRAND}; }
+
+  /* ── Hours grid ── */
+  .ob-hours-hdr {
+    display: grid; grid-template-columns: 110px 1fr 1fr 90px;
+    gap: 10px; margin-bottom: 8px;
+  }
+  .ob-hours-hdr-lbl { font-size: 10px; font-weight: 700; color: ${T.light}; text-transform: uppercase; letter-spacing: 0.07em; padding-left: 2px; }
+  .ob-hours-row {
+    display: grid; grid-template-columns: 110px 1fr 1fr 90px;
+    gap: 10px; align-items: end; margin-bottom: 10px;
+  }
+  .ob-hours-day-lbl { font-size: 13px; font-weight: 600; color: ${T.mid}; padding-bottom: 14px; }
+  .ob-day-closed-btn {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    min-height: 52px; border-radius: 12px;
+    border: 1.5px solid ${T.border}; background: ${T.inputBg};
+    cursor: pointer; font-size: 11px; font-weight: 700;
+    color: ${T.light}; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+  }
+  .ob-day-closed-btn.closed { border-color: #FCA5A5; background: #FEF2F2; color: #DC2626; }
+
   /* Animations */
   @keyframes ob-rise {
     from { opacity: 0; transform: translateY(12px); }
@@ -442,8 +497,12 @@ const CSS = `
   }
   @media (max-width: 480px) {
     .ob-right { padding: 28px 18px; }
-    .ob-row-2, .ob-row-2-1 { grid-template-columns: 1fr; }
+    .ob-row-2, .ob-row-2-1, .ob-row-3 { grid-template-columns: 1fr; }
     .ob-interest-grid { grid-template-columns: 1fr; }
+    .ob-hours-hdr { display: none; }
+    .ob-hours-row { grid-template-columns: 1fr 1fr; }
+    .ob-hours-day-lbl { grid-column: 1 / -1; padding-bottom: 2px; }
+    .ob-day-closed-btn { grid-column: 1 / -1; }
   }
 `;
 
@@ -480,6 +539,35 @@ function planLabel(slug: string) {
 }
 
 // ── Form options ──────────────────────────────────────────────────────────────
+const US_TIMEZONES = [
+  'Eastern Time (ET)',
+  'Central Time (CT)',
+  'Mountain Time (MT)',
+  'Mountain Time – Arizona',
+  'Pacific Time (PT)',
+  'Alaska Time (AKT)',
+  'Hawaii Time (HT)',
+];
+
+const PHONE_PROVIDERS = [
+  'AT&T', 'Comcast / Xfinity', 'Spectrum', 'Vonage', 'RingCentral',
+  '8x8', 'Nextiva', 'Google Voice', 'Grasshopper', 'Ooma', 'Other',
+];
+
+const AFTER_HOURS_POLICIES = [
+  'Iris takes a message',
+  'Transfer to on-call doctor',
+  'Play voicemail greeting only',
+  'Iris answers 24 / 7 (full AI coverage)',
+];
+
+const VOICES = [
+  { id: 'aria',   name: 'Aria',   tone: 'Warm & Professional',      desc: 'Ideal for medical practices' },
+  { id: 'maya',   name: 'Maya',   tone: 'Friendly & Upbeat',        desc: 'Patients connect instantly' },
+  { id: 'claire', name: 'Claire', tone: 'Calm & Precise',           desc: 'Perfect for complex scheduling' },
+  { id: 'jordan', name: 'Jordan', tone: 'Natural & Conversational', desc: 'Feels like real staff' },
+];
+
 const ROLES        = ['Owner / Optometrist', 'Practice Manager', 'Office Manager', 'Front Desk Staff', 'Other'];
 const EHR_SYSTEMS  = ['Eyefinity', 'RevolutionEHR', 'Compulink', 'Crystal PM', 'DrChrono', 'Nextech', 'Other / Not sure'];
 const LOCATIONS    = ['1 location', '2–3 locations', '4–5 locations', '6+ locations'];
@@ -509,9 +597,10 @@ const BENEFITS = [
 ];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type S1 = { practiceName: string; contactName: string; contactRole: string; email: string; phone: string };
-type S2 = { city: string; state: string; locationCount: string; ehrSystem: string; monthlyCallVolume: string; currentPhoneSetup: string };
-type S3 = { interests: string[]; notes: string };
+type S1 = { practiceName: string; contactName: string; email: string; phone: string };
+type S2 = { streetAddress: string; city: string; state: string; zipCode: string; timezone: string; monthlyCallVolume: string; phoneProvider: string; currentPhoneSetup: string };
+type S3 = { officeGreeting: string; locationNote: string; mondayFridayOpen: string; mondayFridayClose: string; saturdayOpen: string; saturdayClose: string; saturdayClosed: boolean; sundayClosed: boolean; lunchBreak: string; afterHoursPolicy: string };
+type S4 = { voice: string; interests: string[]; notes: string };
 
 // ── Field primitives ──────────────────────────────────────────────────────────
 function ObField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
@@ -605,13 +694,10 @@ function Step1Form({ data, onChange, errors }: { data: S1; onChange: (d: S1) => 
         <ObField label="Your Name" error={errors.contactName}>
           <ObInput value={data.contactName} onChange={u('contactName')} placeholder="Dr. Sarah Chen" hasError={!!errors.contactName} />
         </ObField>
-        <ObField label="Your Role" error={errors.contactRole}>
-          <ObSelect value={data.contactRole} onChange={u('contactRole')} options={ROLES} placeholder="Select role" hasError={!!errors.contactRole} />
+        <ObField label="Work Email" error={errors.email}>
+          <ObInput value={data.email} onChange={u('email')} placeholder="sarah@valleyeye.com" type="email" hasError={!!errors.email} />
         </ObField>
       </div>
-      <ObField label="Work Email" error={errors.email}>
-        <ObInput value={data.email} onChange={u('email')} placeholder="sarah@valleyeye.com" type="email" hasError={!!errors.email} />
-      </ObField>
       <ObField label="Practice Phone" error={errors.phone}>
         <ObInput value={data.phone} onChange={u('phone')} placeholder="(208) 552-7323" type="tel" hasError={!!errors.phone} />
       </ObField>
@@ -623,35 +709,144 @@ function Step2Form({ data, onChange, errors }: { data: S2; onChange: (d: S2) => 
   const u = (k: keyof S2) => (v: string) => onChange({ ...data, [k]: v });
   return (
     <div className="ob-fields">
-      <div className="ob-row-2-1">
+      <div className="ob-row-2">
+        <ObField label="Office Time Zone" error={errors.timezone}>
+          <ObSelect value={data.timezone} onChange={u('timezone')} options={US_TIMEZONES} placeholder="Select time zone" hasError={!!errors.timezone} />
+        </ObField>
+        <ObField label="Monthly Call Volume" error={errors.monthlyCallVolume}>
+          <ObSelect value={data.monthlyCallVolume} onChange={u('monthlyCallVolume')} options={CALL_VOLUMES} placeholder="Approx. calls per month?" hasError={!!errors.monthlyCallVolume} />
+        </ObField>
+      </div>
+      <ObField label="Street Address" error={errors.streetAddress}>
+        <ObInput value={data.streetAddress} onChange={u('streetAddress')} placeholder="123 Main St, Suite 200" hasError={!!errors.streetAddress} />
+      </ObField>
+      <div className="ob-row-3">
         <ObField label="City" error={errors.city}>
           <ObInput value={data.city} onChange={u('city')} placeholder="Boise" hasError={!!errors.city} />
         </ObField>
         <ObField label="State" error={errors.state}>
           <ObSelect value={data.state} onChange={u('state')} options={US_STATES} placeholder="ST" hasError={!!errors.state} />
         </ObField>
+        <ObField label="ZIP Code" error={errors.zipCode}>
+          <ObInput value={data.zipCode} onChange={u('zipCode')} placeholder="83702" hasError={!!errors.zipCode} />
+        </ObField>
       </div>
       <div className="ob-row-2">
-        <ObField label="# of Locations" error={errors.locationCount}>
-          <ObSelect value={data.locationCount} onChange={u('locationCount')} options={LOCATIONS} placeholder="How many?" hasError={!!errors.locationCount} />
+        <ObField label="Phone Provider" error={errors.phoneProvider}>
+          <ObSelect value={data.phoneProvider} onChange={u('phoneProvider')} options={PHONE_PROVIDERS} placeholder="Who is your provider?" hasError={!!errors.phoneProvider} />
         </ObField>
-        <ObField label="EHR System" error={errors.ehrSystem}>
-          <ObSelect value={data.ehrSystem} onChange={u('ehrSystem')} options={EHR_SYSTEMS} placeholder="Your EHR" hasError={!!errors.ehrSystem} />
+        <ObField label="Phone System Type" error={errors.currentPhoneSetup}>
+          <ObSelect value={data.currentPhoneSetup} onChange={u('currentPhoneSetup')} options={PHONE_SETUPS} placeholder="What type?" hasError={!!errors.currentPhoneSetup} />
         </ObField>
       </div>
-      <ObField label="Monthly Call Volume" error={errors.monthlyCallVolume}>
-        <ObSelect value={data.monthlyCallVolume} onChange={u('monthlyCallVolume')} options={CALL_VOLUMES} placeholder="Approx. calls per month?" hasError={!!errors.monthlyCallVolume} />
-      </ObField>
-      <ObField label="Current Phone Setup" error={errors.currentPhoneSetup}>
-        <ObSelect value={data.currentPhoneSetup} onChange={u('currentPhoneSetup')} options={PHONE_SETUPS} placeholder="What are you using today?" hasError={!!errors.currentPhoneSetup} />
-      </ObField>
     </div>
   );
 }
 
-function Step3Form({ data, toggle, onChange }: { data: S3; toggle: (id: string) => void; onChange: (d: S3) => void }) {
+function HoursRow({ label, openVal, closeVal, closed, onOpen, onClose, onToggle }: {
+  label: string; openVal: string; closeVal: string; closed: boolean;
+  onOpen: (v: string) => void; onClose: (v: string) => void; onToggle: () => void;
+}) {
+  return (
+    <div className="ob-hours-row">
+      <span className="ob-hours-day-lbl">{label}</span>
+      <div className={`ob-frame${closed ? ' dimmed' : ''}`}>
+        <input type="time" value={openVal} onChange={e => onOpen(e.target.value)} disabled={closed}
+          className="ob-input" style={{ WebkitTextFillColor: T.navy }} />
+      </div>
+      <div className={`ob-frame${closed ? ' dimmed' : ''}`}>
+        <input type="time" value={closeVal} onChange={e => onClose(e.target.value)} disabled={closed}
+          className="ob-input" style={{ WebkitTextFillColor: T.navy }} />
+      </div>
+      <button type="button" onClick={onToggle} className={`ob-day-closed-btn${closed ? ' closed' : ''}`}>
+        {closed ? <><X size={11} /> Closed</> : <><Check size={11} /> Open</>}
+      </button>
+    </div>
+  );
+}
+
+function Step3Form({ data, onChange, errors }: { data: S3; onChange: (d: S3) => void; errors: Record<string, string> }) {
+  const u = (k: keyof S3) => (v: string) => onChange({ ...data, [k]: v });
   return (
     <div className="ob-fields">
+      <ObField label="Office Greeting" error={errors.officeGreeting}>
+        <div className="ob-frame textarea">
+          <textarea
+            value={data.officeGreeting}
+            onChange={e => onChange({ ...data, officeGreeting: e.target.value })}
+            placeholder={`"Thank you for calling Valley Eye Associates, this is Iris. How can I help you today?"`}
+            className="ob-textarea"
+          />
+        </div>
+      </ObField>
+      <ObField label="Office Location Note (optional)">
+        <ObInput value={data.locationNote} onChange={u('locationNote')} placeholder="Suite 200, use the rear entrance off Oak Ave" />
+      </ObField>
+
+      <div>
+        <label className="ob-label">Office Hours for Phone Answering</label>
+        <div className="ob-hours-hdr" style={{ marginTop: 10 }}>
+          <span />
+          <span className="ob-hours-hdr-lbl">Opens</span>
+          <span className="ob-hours-hdr-lbl">Closes</span>
+          <span />
+        </div>
+        <HoursRow
+          label="Mon – Fri" openVal={data.mondayFridayOpen} closeVal={data.mondayFridayClose} closed={false}
+          onOpen={u('mondayFridayOpen')} onClose={u('mondayFridayClose')} onToggle={() => {}}
+        />
+        <HoursRow
+          label="Saturday" openVal={data.saturdayOpen} closeVal={data.saturdayClose} closed={data.saturdayClosed}
+          onOpen={u('saturdayOpen')} onClose={u('saturdayClose')}
+          onToggle={() => onChange({ ...data, saturdayClosed: !data.saturdayClosed })}
+        />
+        <HoursRow
+          label="Sunday" openVal="" closeVal="" closed={data.sundayClosed}
+          onOpen={() => {}} onClose={() => {}}
+          onToggle={() => onChange({ ...data, sundayClosed: !data.sundayClosed })}
+        />
+      </div>
+
+      <div className="ob-row-2">
+        <ObField label="Lunch Break (optional)">
+          <ObInput value={data.lunchBreak} onChange={u('lunchBreak')} placeholder="12:00 PM – 1:00 PM" />
+        </ObField>
+        <ObField label="After-Hours Policy" error={errors.afterHoursPolicy}>
+          <ObSelect value={data.afterHoursPolicy} onChange={u('afterHoursPolicy')} options={AFTER_HOURS_POLICIES} placeholder="What happens after close?" hasError={!!errors.afterHoursPolicy} />
+        </ObField>
+      </div>
+    </div>
+  );
+}
+
+function Step4Form({ data, toggle, onChange }: { data: S4; toggle: (id: string) => void; onChange: (d: S4) => void }) {
+  return (
+    <div className="ob-fields">
+      <div>
+        <label className="ob-label">Choose Iris&rsquo;s voice</label>
+        <p style={{ fontSize: 13, color: T.muted, margin: '0 0 12px' }}>How should Iris sound to your patients?</p>
+        <div className="ob-voice-list">
+          {VOICES.map(({ id, name, tone, desc }) => {
+            const on = data.voice === id;
+            return (
+              <button key={id} type="button" onClick={() => onChange({ ...data, voice: id })} className={`ob-voice-card${on ? ' on' : ''}`}>
+                <div className="ob-voice-radio">
+                  {on && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#fff' }} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div className="ob-voice-tone">{tone}</div>
+                  <div className="ob-voice-name">{name}</div>
+                  <div className="ob-voice-desc">{desc}</div>
+                </div>
+                <div className="ob-voice-icon">
+                  <Mic size={14} style={{ color: on ? '#fff' : T.muted }} />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div>
         <label className="ob-label">What matters most to your practice?</label>
         <p style={{ fontSize: 13, color: T.muted, margin: '0 0 12px' }}>Select all that apply</p>
@@ -686,8 +881,8 @@ function Step3Form({ data, toggle, onChange }: { data: S3; toggle: (id: string) 
 // ── Left panel ────────────────────────────────────────────────────────────────
 function LeftPanel({ step, hasPlanFromUrl }: { step: number; hasPlanFromUrl: boolean }) {
   const labels = hasPlanFromUrl
-    ? ['About your practice', 'Your current setup', 'What matters most']
-    : ['Choose your plan', 'About your practice', 'Your current setup', 'What matters most'];
+    ? ['About your practice', 'Your current setup', 'Office hours & greeting', 'Finish up']
+    : ['Choose your plan', 'About your practice', 'Your current setup', 'Office hours & greeting', 'Finish up'];
 
   return (
     <aside className="ob-left" aria-label="RingIQ onboarding">
@@ -801,15 +996,17 @@ function SuccessScreen({ practiceName, plan }: { practiceName: string; plan: str
 
 // ── Step meta ─────────────────────────────────────────────────────────────────
 const META_WITH_PLAN = [
-  { title: 'Choose your plan',    sub: 'Select the coverage that fits your practice' },
-  { title: 'About your practice', sub: 'Tell us who you are and how to reach you' },
-  { title: 'Your current setup',  sub: 'Help us understand your practice better' },
-  { title: 'What matters most',   sub: 'Select everything you want Iris to handle' },
+  { title: 'Choose your plan',         sub: 'Select the coverage that fits your practice' },
+  { title: 'About your practice',      sub: 'Tell us who you are and how to reach you' },
+  { title: 'Your current setup',       sub: 'Help us understand your practice and phone system' },
+  { title: 'Office hours & greeting',  sub: 'Configure how Iris will represent your practice' },
+  { title: 'What matters most',        sub: 'Pick Iris\'s voice and select your priorities' },
 ];
 const META_NO_PLAN = [
-  { title: 'About your practice', sub: 'Tell us who you are and how to reach you' },
-  { title: 'Your current setup',  sub: 'Help us understand your practice better' },
-  { title: 'What matters most',   sub: 'Select everything you want Iris to handle' },
+  { title: 'About your practice',      sub: 'Tell us who you are and how to reach you' },
+  { title: 'Your current setup',       sub: 'Help us understand your practice and phone system' },
+  { title: 'Office hours & greeting',  sub: 'Configure how Iris will represent your practice' },
+  { title: 'What matters most',        sub: 'Pick Iris\'s voice and select your priorities' },
 ];
 
 // ── Inner component ───────────────────────────────────────────────────────────
@@ -820,7 +1017,7 @@ function OnboardContent() {
   const urlPlan        = validSlugs.includes(urlPlanRaw) ? (urlPlanRaw as PlanSlug) : '';
   const hasPlanFromUrl = !!urlPlan;
 
-  const totalSteps = hasPlanFromUrl ? 3 : 4;
+  const totalSteps = hasPlanFromUrl ? 4 : 5;
   const [step,        setStep]        = useState(1);
   const [plan,        setPlan]        = useState<PlanSlug | ''>(urlPlan);
   const [submitting,  setSubmitting]  = useState(false);
@@ -828,13 +1025,15 @@ function OnboardContent() {
   const [submitError, setSubmitError] = useState('');
   const [errors,      setErrors]      = useState<Record<string, string>>({});
 
-  const [s1, setS1] = useState<S1>({ practiceName: '', contactName: '', contactRole: '', email: '', phone: '' });
-  const [s2, setS2] = useState<S2>({ city: '', state: '', locationCount: '', ehrSystem: '', monthlyCallVolume: '', currentPhoneSetup: '' });
-  const [s3, setS3] = useState<S3>({ interests: [], notes: '' });
+  const [s1, setS1] = useState<S1>({ practiceName: '', contactName: '', email: '', phone: '' });
+  const [s2, setS2] = useState<S2>({ streetAddress: '', city: '', state: '', zipCode: '', timezone: '', monthlyCallVolume: '', phoneProvider: '', currentPhoneSetup: '' });
+  const [s3, setS3] = useState<S3>({ officeGreeting: '', locationNote: '', mondayFridayOpen: '08:00', mondayFridayClose: '17:00', saturdayOpen: '09:00', saturdayClose: '14:00', saturdayClosed: false, sundayClosed: true, lunchBreak: '', afterHoursPolicy: '' });
+  const [s4, setS4] = useState<S4>({ voice: '', interests: [], notes: '' });
 
   const practiceStep = hasPlanFromUrl ? 1 : 2;
   const setupStep    = hasPlanFromUrl ? 2 : 3;
-  const goalsStep    = hasPlanFromUrl ? 3 : 4;
+  const officeStep   = hasPlanFromUrl ? 3 : 4;
+  const goalsStep    = hasPlanFromUrl ? 4 : 5;
   const planStep     = hasPlanFromUrl ? null : 1;
 
   const meta = hasPlanFromUrl ? META_NO_PLAN : META_WITH_PLAN;
@@ -843,7 +1042,6 @@ function OnboardContent() {
     const e: Record<string, string> = {};
     if (s1.practiceName.trim().length < 2)              e.practiceName = 'Practice name is required';
     if (!s1.contactName.trim())                         e.contactName  = 'Your name is required';
-    if (!s1.contactRole)                                e.contactRole  = 'Please select your role';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s1.email))  e.email        = 'Enter a valid email address';
     if (!/^\d{10}$/.test(s1.phone.replace(/\D/g, ''))) e.phone        = 'Enter a valid 10-digit phone number';
     setErrors(e);
@@ -852,12 +1050,20 @@ function OnboardContent() {
 
   const validateSetup = () => {
     const e: Record<string, string> = {};
-    if (!s2.city.trim())       e.city              = 'City is required';
-    if (!s2.state)             e.state             = 'State is required';
-    if (!s2.locationCount)     e.locationCount     = 'Required';
-    if (!s2.ehrSystem)         e.ehrSystem         = 'Required';
-    if (!s2.monthlyCallVolume) e.monthlyCallVolume = 'Required';
-    if (!s2.currentPhoneSetup) e.currentPhoneSetup = 'Required';
+    if (!s2.timezone)                                          e.timezone       = 'Required';
+    if (!s2.streetAddress.trim())                              e.streetAddress  = 'Street address is required';
+    if (!s2.city.trim())                                       e.city           = 'City is required';
+    if (!s2.state)                                             e.state          = 'State is required';
+    if (!/^\d{5}$/.test(s2.zipCode.replace(/\D/g, '').slice(0,5))) e.zipCode   = 'Enter a valid 5-digit ZIP';
+    if (!s2.monthlyCallVolume)                                 e.monthlyCallVolume = 'Required';
+    if (!s2.currentPhoneSetup)                                 e.currentPhoneSetup = 'Required';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const validateOffice = () => {
+    const e: Record<string, string> = {};
+    if (!s3.afterHoursPolicy) e.afterHoursPolicy = 'Required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -869,6 +1075,7 @@ function OnboardContent() {
     }
     if (step === practiceStep && !validatePractice()) return;
     if (step === setupStep    && !validateSetup())    return;
+    if (step === officeStep   && !validateOffice())   return;
     setErrors({});
     setStep((n) => n + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -883,7 +1090,27 @@ function OnboardContent() {
       const res = await fetch('/api/queue', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...s1, ...s2, interests: s3.interests, notes: s3.notes, plan: plan || '', phone: s1.phone.replace(/\D/g, '') }),
+        body:    JSON.stringify({
+          ...s1,
+          contactRole: 'Owner / Optometrist',
+          ...s2,
+          ehrSystem: 'Crystal PM',
+          locationCount: '1 location',
+          officeGreeting:     s3.officeGreeting,
+          locationNote:       s3.locationNote,
+          officeHours: {
+            mondayFriday: { open: s3.mondayFridayOpen, close: s3.mondayFridayClose },
+            saturday:     { open: s3.saturdayOpen,     close: s3.saturdayClose,    closed: s3.saturdayClosed },
+            sunday:       { closed: s3.sundayClosed },
+          },
+          lunchBreak:         s3.lunchBreak,
+          afterHoursPolicy:   s3.afterHoursPolicy,
+          voice:              s4.voice,
+          interests:          s4.interests,
+          notes:              s4.notes,
+          plan:               plan || '',
+          phone:              s1.phone.replace(/\D/g, ''),
+        }),
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error ?? 'Submission failed');
@@ -896,7 +1123,7 @@ function OnboardContent() {
   };
 
   const toggleInterest = (id: string) =>
-    setS3((prev) => ({
+    setS4((prev) => ({
       ...prev,
       interests: prev.interests.includes(id)
         ? prev.interests.filter((i) => i !== id)
@@ -959,7 +1186,8 @@ function OnboardContent() {
               )}
               {step === practiceStep && <Step1Form data={s1} onChange={setS1} errors={errors} />}
               {step === setupStep    && <Step2Form data={s2} onChange={setS2} errors={errors} />}
-              {step === goalsStep    && <Step3Form data={s3} toggle={toggleInterest} onChange={setS3} />}
+              {step === officeStep   && <Step3Form data={s3} onChange={setS3} errors={errors} />}
+              {step === goalsStep    && <Step4Form data={s4} toggle={toggleInterest} onChange={setS4} />}
             </div>
 
             {submitError && (

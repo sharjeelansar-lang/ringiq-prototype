@@ -107,12 +107,6 @@ export default function BusinessesPage() {
                   {loading ? '...' : totalCount}
                 </span>
               </div>
-              {!loading && !fetchError && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.teal, display: 'block' }} />
-                  <span style={{ fontSize: 11, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>Live · MongoDB Atlas</span>
-                </div>
-              )}
             </div>
 
             {fetchError && (

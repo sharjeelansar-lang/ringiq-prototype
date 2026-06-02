@@ -10,7 +10,7 @@ export function EHRMappingSection({ form }: Props) {
   const { register, formState: { errors } } = form;
 
   return (
-    <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <FormField
         label="Email Company Code"
         hint='EHR company identifier — e.g. "tso", "icare"'

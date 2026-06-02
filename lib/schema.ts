@@ -57,8 +57,26 @@ export const businessFormSchema = z.object({
     sunday: businessHoursSchema,
   }),
   internalWorkingHours: z.string(),
+  officeGreeting: z.string().optional(),
+  locationNote: z.string().optional(),
+  afterHoursPolicy: z.string().optional(),
+  onCallDoctorName: z.string().optional(),
+  onCallDoctorPhone: z.string().optional().or(z.literal('')),
 
-  // E. Behavior Toggles
+  // E. Phone Routing
+  phoneProvider: z.string().optional(),
+  billingDeptPhone: z.string().optional().or(z.literal('')),
+  medicalDeptPhone: z.string().optional().or(z.literal('')),
+  otherDeptPhone: z.string().optional().or(z.literal('')),
+
+  // F. AI Voice & Behavior
+  vapiVoiceId: z.string().optional(),
+  discontinueGreetings: z.boolean(),
+
+  // H. Prospect metadata
+  prospectPlan: z.string().optional(),
+
+  // G. Behavior Toggles
   recordingDisclosure: z.boolean(),
   allowSameDayBookings: z.boolean(),
   maxSlotSearchRounds: z.number().int().min(1).max(5),

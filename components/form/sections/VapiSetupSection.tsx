@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   Bot, Link2, CheckCircle2, Loader2,
-  Phone, Sparkles, AlertCircle,
+  Phone, Sparkles, AlertCircle, Mic, Volume2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BusinessFormSchema } from '@/lib/schema';
@@ -45,6 +45,13 @@ function StepBadge({ n, done, active }: { n: number; done: boolean; active: bool
   );
 }
 
+const VOICES = [
+  { id: 'aria',   label: 'Aria',   desc: 'Warm · Friendly · Professional' },
+  { id: 'maya',   label: 'Maya',   desc: 'Clear · Articulate · Confident'  },
+  { id: 'claire', label: 'Claire', desc: 'Calm · Empathetic · Reassuring'  },
+  { id: 'jordan', label: 'Jordan', desc: 'Bright · Energetic · Approachable' },
+] as const;
+
 export function VapiSetupSection({ form }: Props) {
   const { watch, setValue } = form;
 
@@ -56,6 +63,8 @@ export function VapiSetupSection({ form }: Props) {
   const recordingDisclosure  = watch('recordingDisclosure');
   const allowSameDayBookings = watch('allowSameDayBookings');
   const vapiPhoneNumber      = watch('vapiAssistantPhoneNumber');
+  const vapiVoiceId          = watch('vapiVoiceId');
+  const discontinueGreetings = watch('discontinueGreetings');
 
   const formSid   = watch('twilioSubAccountSid');
   const formToken = watch('twilioSubAccountToken');
@@ -111,6 +120,7 @@ export function VapiSetupSection({ form }: Props) {
         body: JSON.stringify({
           practiceDisplayName, cpmid, mongoOfficeId, publicNumber,
           syeLocationId, recordingDisclosure, allowSameDayBookings,
+          voiceId: vapiVoiceId || 'aria',
         }),
       });
       const json = await res.json();
@@ -198,16 +208,16 @@ export function VapiSetupSection({ form }: Props) {
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 20px', borderBottom: `1px solid ${T.border}`,
+        padding: '11px 16px', borderBottom: `1px solid ${T.border}`,
         background: T.hover,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+            width: 28, height: 28, borderRadius: 7, flexShrink: 0,
             background: T.violetFd, border: `1px solid ${T.violetBd}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Bot size={14} style={{ color: T.violet }} />
+            <Bot size={13} style={{ color: T.violet }} />
           </div>
           <div>
             <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>VAPI AI Setup</p>
@@ -221,10 +231,7 @@ export function VapiSetupSection({ form }: Props) {
           background: missingTwilio ? 'rgba(245,158,11,0.06)' : 'rgba(16,185,129,0.06)',
           color: missingTwilio ? '#B45309' : '#059669',
         }}>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: missingTwilio ? '#F59E0B' : '#10B981',
-          }} />
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: missingTwilio ? '#F59E0B' : '#10B981' }} />
           {missingTwilio ? 'Twilio step pending' : 'Twilio ready'}
         </div>
       </div>
@@ -232,139 +239,214 @@ export function VapiSetupSection({ form }: Props) {
       {/* Prerequisite warning */}
       {missingTwilio && (
         <div style={{
-          margin: '12px 16px 0',
+          margin: '10px 14px 0',
           display: 'flex', alignItems: 'flex-start', gap: 8,
-          padding: '10px 14px', borderRadius: 8,
+          padding: '8px 12px', borderRadius: 8,
           border: '1px solid rgba(245,158,11,0.2)',
           background: 'rgba(245,158,11,0.05)',
         }}>
-          <AlertCircle size={13} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 1 }} />
+          <AlertCircle size={12} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 1 }} />
           <p style={{ fontSize: 12, color: '#B45309', margin: 0 }}>
-            Complete the Twilio Setup step first — the sub-account credentials are needed to link the VAPI number.
+            Complete the Twilio Setup step first — sub-account credentials are needed to link the VAPI number.
           </p>
         </div>
       )}
 
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* ── 2-column body ─────────────────────────────────────────────────── */}
+      <div style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
 
-        {/* Step 1: Create assistant */}
-        <div style={{ display: 'flex', gap: 14, opacity: missingTwilio ? 0.5 : 1, pointerEvents: missingTwilio ? 'none' : 'auto' }}>
-          <StepBadge n={1} done={!!assistant} active={!assistant && !missingTwilio} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Deploy Iris Assistant</p>
-                <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Creates a VAPI AI agent with a practice-specific prompt</p>
-              </div>
-              {assistant && (
-                <span style={{
-                  fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: T.violet,
-                  background: T.violetFd, border: `1px solid ${T.violetBd}`,
-                  padding: '3px 8px', borderRadius: 100, whiteSpace: 'nowrap',
-                }}>
-                  {assistant.id.slice(0, 14)}…
-                </span>
-              )}
-            </div>
-
-            {!assistant ? (
-              <>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '10px 14px', borderRadius: 8,
-                  background: T.hover, border: `1px solid ${T.border}`,
-                }}>
-                  <Sparkles size={13} style={{ color: T.violet, flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontSize: 11, color: T.muted }}>Assistant name</span>
-                    <span style={{ fontSize: 13, color: T.navy, fontWeight: 500 }}>
-                      {practiceName ? `${practiceName} — Iris` : 'Enter a practice name in Step 1'}
-                    </span>
-                  </div>
-                </div>
-                {assistError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{assistError}</p>}
-                <button type="button" onClick={createAssistant}
-                  disabled={assistLoading || !practiceDisplayName || !cpmid}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-                    background: T.violetFd, color: T.violet, border: `1.5px solid ${T.violetBd}`,
-                    cursor: assistLoading || !practiceDisplayName || !cpmid ? 'not-allowed' : 'pointer',
-                    opacity: assistLoading || !practiceDisplayName || !cpmid ? 0.5 : 1,
-                    fontFamily: 'inherit', width: 'fit-content',
-                  }}>
-                  {assistLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Bot size={13} />}
-                  {assistLoading ? 'Deploying…' : 'Deploy Iris'}
-                </button>
-              </>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: T.violet }}>
-                <CheckCircle2 size={13} /> {assistant.name} deployed
-              </div>
-            )}
+        {/* Left: Voice + toggle */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Mic size={11} style={{ color: T.violet }} />
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.light }}>
+              AI Voice
+            </span>
           </div>
-        </div>
 
-        <div style={{ borderTop: `1px solid ${T.border}` }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            {VOICES.map((v) => {
+              const selected = vapiVoiceId === v.id;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setValue('vapiVoiceId', v.id, { shouldValidate: false })}
+                  style={{
+                    display: 'flex', flexDirection: 'column', gap: 3,
+                    padding: '9px 10px', borderRadius: 8, textAlign: 'left',
+                    border: `1.5px solid ${selected ? T.violet : T.border}`,
+                    background: selected ? T.violetFd : T.hover,
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Volume2 size={10} style={{ color: selected ? T.violet : T.light }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: selected ? T.violet : T.navy }}>{v.label}</span>
+                  </div>
+                  <span style={{ fontSize: 10, color: T.light, lineHeight: 1.4 }}>{v.desc}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Step 2: Link VAPI number */}
-        <div style={{ display: 'flex', gap: 14, opacity: !assistant ? 0.45 : 1, pointerEvents: !assistant ? 'none' : 'auto' }}>
-          <StepBadge n={2} done={linked} active={!!assistant && !linked} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minWidth: 0 }}>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Link VAPI Number to Iris</p>
-              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Imports the VAPI line and routes inbound calls to the assistant</p>
+          {!vapiVoiceId && (
+            <p style={{ fontSize: 11, color: T.light }}>No voice selected — defaults to Aria on deploy.</p>
+          )}
+
+          {/* Discontinue greetings */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '9px 12px', borderRadius: 8, border: `1px solid ${T.border}`, background: T.hover,
+            marginTop: 2,
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: T.navy }}>Discontinue Greetings</span>
+              <span style={{ fontSize: 11, color: T.muted }}>Turn off AI greetings for this practice</span>
             </div>
-
-            {vapiPhoneNumber ? (
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '10px 14px', borderRadius: 8,
-                background: T.hover, border: `1px solid ${T.border}`,
-              }}>
-                <Phone size={14} style={{ color: T.violet, flexShrink: 0 }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-                  <span style={{ fontSize: 13, fontFamily: 'var(--font-geist-mono)', color: T.navy }}>{vapiPhoneNumber}</span>
-                  <span style={{ fontSize: 11, color: T.muted }}>VAPI AI line to Iris</span>
-                </div>
-                {assistant && (
-                  <span style={{ fontSize: 11, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>
-                    {assistant.id.slice(0, 10)}…
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div style={{
-                display: 'flex', alignItems: 'flex-start', gap: 8,
-                padding: '10px 14px', borderRadius: 8,
-                border: `1px solid ${T.border}`, background: T.hover,
-              }}>
-                <AlertCircle size={13} style={{ color: T.light, flexShrink: 0, marginTop: 1 }} />
-                <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>
-                  Enter the VAPI AI Assistant Number in the <span style={{ color: T.navy, fontWeight: 500 }}>Phone Numbers</span> section on Step 1.
-                </p>
-              </div>
-            )}
-
-            {linkError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{linkError}</p>}
-
-            <button type="button" onClick={linkNumber}
-              disabled={!assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading}
+            <button
+              type="button"
+              onClick={() => setValue('discontinueGreetings', !discontinueGreetings, { shouldValidate: false })}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
-                background: T.violet, color: '#fff', border: 'none',
-                cursor: !assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading ? 'not-allowed' : 'pointer',
-                opacity: !assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading ? 0.45 : 1,
-                boxShadow: '0 4px 14px rgba(124,58,237,0.2)',
-                fontFamily: 'inherit', width: 'fit-content',
-              }}>
-              {linkLoading ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Link2 size={13} />}
-              {linkLoading ? 'Linking…' : 'Link Number'}
+                width: 38, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer',
+                background: discontinueGreetings ? '#EF4444' : '#E2E8F0',
+                position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+              }}
+            >
+              <div style={{
+                position: 'absolute', top: 2, left: discontinueGreetings ? 19 : 2,
+                width: 16, height: 16, borderRadius: '50%', background: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+              }} />
             </button>
           </div>
         </div>
 
+        {/* Right: Deploy + Link steps */}
+        <div style={{
+          display: 'flex', flexDirection: 'column', gap: 12,
+          borderLeft: `1px solid ${T.border}`, paddingLeft: 24,
+        }}>
+
+          {/* Step 1: Deploy */}
+          <div style={{ display: 'flex', gap: 12, opacity: missingTwilio ? 0.5 : 1, pointerEvents: missingTwilio ? 'none' : 'auto' }}>
+            <StepBadge n={1} done={!!assistant} active={!assistant && !missingTwilio} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Deploy Iris Assistant</p>
+                  <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Creates a VAPI AI agent with a practice-specific prompt</p>
+                </div>
+                {assistant && (
+                  <span style={{
+                    fontSize: 11, fontFamily: 'var(--font-geist-mono)', color: T.violet,
+                    background: T.violetFd, border: `1px solid ${T.violetBd}`,
+                    padding: '3px 8px', borderRadius: 100, whiteSpace: 'nowrap',
+                  }}>
+                    {assistant.id.slice(0, 12)}…
+                  </span>
+                )}
+              </div>
+
+              {!assistant ? (
+                <>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 12px', borderRadius: 8,
+                    background: T.hover, border: `1px solid ${T.border}`,
+                  }}>
+                    <Sparkles size={12} style={{ color: T.violet, flexShrink: 0 }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <span style={{ fontSize: 11, color: T.muted }}>Assistant name</span>
+                      <span style={{ fontSize: 12, color: T.navy, fontWeight: 500 }}>
+                        {practiceName ? `${practiceName} — Iris` : 'Enter a practice name in Step 1'}
+                      </span>
+                    </div>
+                  </div>
+                  {assistError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{assistError}</p>}
+                  <button type="button" onClick={createAssistant}
+                    disabled={assistLoading || !practiceDisplayName || !cpmid}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                      background: T.violetFd, color: T.violet, border: `1.5px solid ${T.violetBd}`,
+                      cursor: assistLoading || !practiceDisplayName || !cpmid ? 'not-allowed' : 'pointer',
+                      opacity: assistLoading || !practiceDisplayName || !cpmid ? 0.5 : 1,
+                      fontFamily: 'inherit', width: 'fit-content',
+                    }}>
+                    {assistLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Bot size={12} />}
+                    {assistLoading ? 'Deploying…' : 'Deploy Iris'}
+                  </button>
+                </>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: T.violet }}>
+                  <CheckCircle2 size={13} /> {assistant.name} deployed
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${T.border}` }} />
+
+          {/* Step 2: Link */}
+          <div style={{ display: 'flex', gap: 12, opacity: !assistant ? 0.45 : 1, pointerEvents: !assistant ? 'none' : 'auto' }}>
+            <StepBadge n={2} done={linked} active={!!assistant && !linked} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1, minWidth: 0 }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: T.navy, margin: 0 }}>Link VAPI Number to Iris</p>
+                <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>Imports the VAPI line and routes inbound calls to the assistant</p>
+              </div>
+
+              {vapiPhoneNumber ? (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '8px 12px', borderRadius: 8,
+                  background: T.hover, border: `1px solid ${T.border}`,
+                }}>
+                  <Phone size={13} style={{ color: T.violet, flexShrink: 0 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
+                    <span style={{ fontSize: 12, fontFamily: 'var(--font-geist-mono)', color: T.navy }}>{vapiPhoneNumber}</span>
+                    <span style={{ fontSize: 11, color: T.muted }}>VAPI AI line → Iris</span>
+                  </div>
+                  {assistant && (
+                    <span style={{ fontSize: 10, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>
+                      {assistant.id.slice(0, 8)}…
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 8,
+                  padding: '8px 12px', borderRadius: 8,
+                  border: `1px solid ${T.border}`, background: T.hover,
+                }}>
+                  <AlertCircle size={12} style={{ color: T.light, flexShrink: 0, marginTop: 1 }} />
+                  <p style={{ fontSize: 12, color: T.muted, margin: 0 }}>
+                    Enter the VAPI AI Assistant Number in the <span style={{ color: T.navy, fontWeight: 500 }}>Phone Numbers</span> section on Step 1.
+                  </p>
+                </div>
+              )}
+
+              {linkError && <p style={{ fontSize: 11, color: '#DC2626', margin: 0 }}>{linkError}</p>}
+
+              <button type="button" onClick={linkNumber}
+                disabled={!assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                  background: T.violet, color: '#fff', border: 'none',
+                  cursor: !assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading ? 'not-allowed' : 'pointer',
+                  opacity: !assistant || !vapiPhoneNumber || !subAccountSid || !subAccountToken || linkLoading ? 0.45 : 1,
+                  boxShadow: '0 4px 14px rgba(124,58,237,0.2)',
+                  fontFamily: 'inherit', width: 'fit-content',
+                }}>
+                {linkLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Link2 size={12} />}
+                {linkLoading ? 'Linking…' : 'Link Number'}
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

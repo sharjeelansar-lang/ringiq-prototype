@@ -30,7 +30,13 @@
       "Bash(mkdir -p /Users/sharjeelansar/Documents/CCRIPT/RingIQ/ringiq-prototype/app/api/queue/\\\\[id\\\\] /Users/sharjeelansar/Documents/CCRIPT/RingIQ/ringiq-prototype/app/dashboard/businesses /Users/sharjeelansar/Documents/CCRIPT/RingIQ/ringiq-prototype/app/dashboard/queue)",
       "Bash(wget -q -O /dev/null --server-response http://localhost:3000/dashboard)",
       "Bash(wget -q -O /dev/null --server-response http://localhost:3000/dashboard/queue)",
-      "Bash(wget -q -O /dev/null --server-response \"http://localhost:3000/onboard?plan=backup\")"
+      "Bash(wget -q -O /dev/null --server-response \"http://localhost:3000/onboard?plan=backup\")",
+      "Bash(ls ~/.claude/)",
+      "Read(//Users/sharjeelansar/.claude/**)",
+      "Bash(find ~/Documents -type d -name \"skills\" 2>/dev/null)",
+      "Read(//Users/sharjeelansar/Documents/**)",
+      "Bash(find ~/Documents -type d -name \"claude-skills\" 2>/dev/null; find ~ -maxdepth 3 -type d -name \"claude-skills\" 2>/dev/null)",
+      "Read(//Users/sharjeelansar/**)"
     ],
     "additionalDirectories": [
       "/Users/sharjeelansar/Documents/CCRIPT/RingIQ/ringiq-prototype/app/api/queue"
