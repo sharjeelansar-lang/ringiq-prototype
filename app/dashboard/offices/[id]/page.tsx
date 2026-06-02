@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft, Building2, Cpu, Phone, MapPin,
   CheckCircle2, Clock, Copy, Check, ExternalLink, RefreshCw,
-  PhoneCall, Hash, Globe,
+  PhoneCall, Hash, Globe, Layers,
 } from 'lucide-react';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { cn } from '@/lib/utils';
@@ -29,7 +29,14 @@ interface OfficeDetail {
   workingHours: Record<string, HoursBlock>;
   workingLunchHours: { doctorLunch?: string };
   ehr: { cpmid: string; syeLocationId: number };
+  prospectPlan?: string;
 }
+
+const PLAN_LABELS: Record<string, string> = {
+  'nights-weekends': 'Free Nights & Weekends',
+  'backup':          '3-Ring Backup',
+  'full-service':    'Full Service',
+};
 
 // ── Copy row ──────────────────────────────────────────────────────────────────
 
@@ -45,24 +52,24 @@ function DataRow({ label, value, mono = false }: { label: string; value?: string
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 py-2.5 border-b border-slate-800/30 last:border-0 group">
-      <span className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 w-36 shrink-0">
+    <div className="flex items-center justify-between gap-4 py-2.5 border-b border-slate-100 last:border-0 group">
+      <span className="text-[10px] font-semibold tracking-widest uppercase text-slate-400 w-36 shrink-0">
         {label}
       </span>
       <div className="flex items-center gap-2 flex-1 justify-end min-w-0">
         <span className={cn(
           'text-right break-all leading-snug',
-          mono ? 'font-mono text-xs text-[#8EA7F0]' : 'text-xs text-slate-300',
-          display === '—' ? 'text-slate-700' : '',
+          mono ? 'font-mono text-xs text-[#274993]' : 'text-xs text-slate-700',
+          display === '—' ? 'text-slate-300' : '',
         )}>
           {display}
         </span>
         {canCopy && (
           <button
             onClick={copy}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-600 hover:text-slate-300 shrink-0"
+            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-slate-600 shrink-0"
           >
-            {copied ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
+            {copied ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
           </button>
         )}
       </div>
@@ -73,11 +80,11 @@ function DataRow({ label, value, mono = false }: { label: string; value?: string
 // ── Panel ─────────────────────────────────────────────────────────────────────
 
 const ACCENT: Record<string, { icon: string; border: string; bg: string }> = {
-  cyan:    { icon: 'text-[#5B7BD8]',    border: 'border-[#274993]/20',    bg: 'bg-[#274993]/8' },
-  violet:  { icon: 'text-violet-400',  border: 'border-violet-500/20',  bg: 'bg-violet-500/8' },
-  emerald: { icon: 'text-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/8' },
-  amber:   { icon: 'text-amber-400',   border: 'border-amber-500/20',   bg: 'bg-amber-500/8' },
-  rose:    { icon: 'text-rose-400',    border: 'border-rose-500/20',    bg: 'bg-rose-500/8' },
+  cyan:    { icon: 'text-[#274993]',   border: 'border-blue-200',    bg: 'bg-blue-50' },
+  violet:  { icon: 'text-violet-600',  border: 'border-violet-200',  bg: 'bg-violet-50' },
+  emerald: { icon: 'text-emerald-600', border: 'border-emerald-200', bg: 'bg-emerald-50' },
+  amber:   { icon: 'text-amber-600',   border: 'border-amber-200',   bg: 'bg-amber-50' },
+  rose:    { icon: 'text-rose-600',    border: 'border-rose-200',    bg: 'bg-rose-50' },
 };
 
 function Panel({ title, icon: Icon, accent = 'cyan', children }: {
@@ -85,12 +92,12 @@ function Panel({ title, icon: Icon, accent = 'cyan', children }: {
 }) {
   const a = ACCENT[accent] ?? ACCENT.cyan;
   return (
-    <div className="rounded-xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-3 border-b border-slate-800/50 bg-slate-900/60">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3 border-b border-slate-100 bg-slate-50">
         <div className={cn('flex items-center justify-center w-7 h-7 rounded-lg border', a.bg, a.border)}>
           <Icon size={13} className={a.icon} />
         </div>
-        <span className="text-xs font-semibold text-slate-300 tracking-wide">{title}</span>
+        <span className="text-xs font-semibold text-slate-600 tracking-wide">{title}</span>
       </div>
       <div className="px-5 py-1">{children}</div>
     </div>
@@ -105,8 +112,8 @@ function StatusBadge({ status }: { status: string }) {
     <span className={cn(
       'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border',
       isLive
-        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-        : 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        : 'bg-amber-50 text-amber-700 border-amber-200',
     )}>
       {isLive ? <CheckCircle2 size={11} /> : <Clock size={11} />}
       {isLive ? 'Live Production' : 'Internal Testing'}
@@ -119,13 +126,13 @@ function StatusBadge({ status }: { status: string }) {
 function Skeleton() {
   return (
     <div className="flex flex-col gap-5 animate-pulse">
-      <div className="h-20 bg-slate-900/60 rounded-xl border border-slate-800/50" />
+      <div className="h-20 bg-white rounded-xl border border-slate-200 shadow-sm" />
       <div className="grid grid-cols-2 gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="rounded-xl border border-slate-800/60 bg-slate-900/30 p-4 flex flex-col gap-2.5">
-            <div className="h-3.5 bg-slate-800 rounded w-28" />
+          <div key={i} className="rounded-xl border border-slate-200 bg-white shadow-sm p-4 flex flex-col gap-2.5">
+            <div className="h-3.5 bg-slate-100 rounded w-28" />
             {[...Array(3)].map((__, j) => (
-              <div key={j} className="h-2.5 bg-slate-800/60 rounded w-full" style={{ opacity: 1 - j * 0.25 }} />
+              <div key={j} className="h-2.5 bg-slate-100 rounded w-full" style={{ opacity: 1 - j * 0.25 }} />
             ))}
           </div>
         ))}
@@ -166,39 +173,39 @@ export default function OfficeDetailPage() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
       <Sidebar />
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── Header ── */}
-        <header className="flex items-center gap-4 px-8 py-5 border-b border-slate-800/70 bg-slate-950/80 backdrop-blur-sm shrink-0">
+        <header className="flex items-center gap-4 px-8 py-5 border-b border-slate-200 bg-white/90 backdrop-blur-sm shrink-0">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-200
-              transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-800 shrink-0"
+            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800
+              transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-100 shrink-0"
           >
             <ArrowLeft size={15} />
             Back
           </button>
-          <div className="w-px h-5 bg-slate-800" />
+          <div className="w-px h-5 bg-slate-200" />
 
           {office ? (
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="min-w-0">
-                <h1 className="text-lg font-bold text-white tracking-tight truncate">{office.name}</h1>
-                <p className="text-[11px] font-mono text-slate-600 mt-0.5">{office._id}</p>
+                <h1 className="text-lg font-bold text-slate-900 tracking-tight truncate">{office.name}</h1>
+                <p className="text-[11px] font-mono text-slate-400 mt-0.5">{office._id}</p>
               </div>
               <StatusBadge status={office.officeStatus} />
             </div>
           ) : (
-            <div className="h-6 bg-slate-800 rounded w-48 animate-pulse" />
+            <div className="h-6 bg-slate-100 rounded w-48 animate-pulse" />
           )}
 
           {office && (
             <button
               onClick={() => window.location.reload()}
-              className="ml-auto text-slate-600 hover:text-slate-300 transition-colors p-2 rounded-lg hover:bg-slate-800 shrink-0"
+              className="ml-auto text-slate-400 hover:text-slate-700 transition-colors p-2 rounded-lg hover:bg-slate-100 shrink-0"
               title="Refresh"
             >
               <RefreshCw size={14} />
@@ -211,9 +218,9 @@ export default function OfficeDetailPage() {
           {loading && <Skeleton />}
 
           {error && (
-            <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400">
+            <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-red-200 bg-red-50 text-red-600">
               <span className="font-semibold text-sm">Failed to load:</span>
-              <span className="text-sm text-red-400/70">{error}</span>
+              <span className="text-sm text-red-500">{error}</span>
               <button onClick={() => router.push('/dashboard')} className="ml-auto text-xs underline">
                 Back to dashboard
               </button>
@@ -224,39 +231,52 @@ export default function OfficeDetailPage() {
             <div className="flex flex-col gap-5">
 
               {/* ── Hero strip — key identifiers at a glance ── */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 {/* Primary phone */}
-                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-800/60 bg-slate-900/50">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#274993]/8 border border-[#274993]/20 shrink-0">
-                    <Phone size={14} className="text-[#5B7BD8]" />
+                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 shrink-0">
+                    <Phone size={14} className="text-[#274993]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 mb-1">Inbound Line</p>
-                    <p className="text-sm font-mono text-[#8EA7F0] font-semibold truncate">
+                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-400 mb-1">Inbound Line</p>
+                    <p className="text-sm font-mono text-[#274993] font-semibold truncate">
                       {office.twilioNumbers?.[0]?.number || '—'}
                     </p>
                   </div>
                 </div>
 
                 {/* Timezone */}
-                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-800/60 bg-slate-900/50">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-500/8 border border-violet-500/20 shrink-0">
-                    <Globe size={14} className="text-violet-400" />
+                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 shrink-0">
+                    <Globe size={14} className="text-violet-600" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 mb-1">Timezone</p>
-                    <p className="text-sm font-mono text-slate-300 truncate">{office.tzName || '—'}</p>
+                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-400 mb-1">Timezone</p>
+                    <p className="text-sm font-mono text-slate-700 truncate">{office.tzName || '—'}</p>
                   </div>
                 </div>
 
                 {/* CPMID */}
-                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-800/60 bg-slate-900/50">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/8 border border-amber-500/20 shrink-0">
-                    <Hash size={14} className="text-amber-400" />
+                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 shrink-0">
+                    <Hash size={14} className="text-amber-600" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-600 mb-1">CPM ID</p>
-                    <p className="text-sm font-mono text-slate-300 truncate">{office.ehr?.cpmid || '—'}</p>
+                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-400 mb-1">CPM ID</p>
+                    <p className="text-sm font-mono text-slate-700 truncate">{office.ehr?.cpmid || '—'}</p>
+                  </div>
+                </div>
+
+                {/* Plan */}
+                <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 shrink-0">
+                    <Layers size={14} className="text-emerald-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold tracking-widest uppercase text-slate-400 mb-1">Plan</p>
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {office.prospectPlan ? (PLAN_LABELS[office.prospectPlan] ?? office.prospectPlan) : '—'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -268,6 +288,7 @@ export default function OfficeDetailPage() {
                   <DataRow label="Display Name"  value={office.name} />
                   <DataRow label="Clean Name"    value={office.corporateCleanName} mono />
                   <DataRow label="Status"        value={office.officeStatus} />
+                  <DataRow label="Plan"          value={office.prospectPlan ? (PLAN_LABELS[office.prospectPlan] ?? office.prospectPlan) : undefined} />
                   <DataRow label="Service Plan"  value={office.servicePlan} mono />
                   <DataRow label="Office ID"     value={office._id} mono />
                   <DataRow label="Created"       value={office.createdAt ? new Date(office.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : ''} />
@@ -308,7 +329,7 @@ export default function OfficeDetailPage() {
                         value={block.isOpen ? `${block.open} – ${block.close}` : 'Closed'}
                       />
                     ))
-                    : <div className="py-3 text-xs text-slate-600">No hours configured</div>
+                    : <div className="py-3 text-xs text-slate-400">No hours configured</div>
                   }
                   {office.workingLunchHours?.doctorLunch && (
                     <DataRow label="Lunch Block" value={office.workingLunchHours.doctorLunch} />
@@ -318,26 +339,26 @@ export default function OfficeDetailPage() {
                 <Panel title="Provisioned Lines" icon={PhoneCall} accent="cyan">
                   {office.twilioNumbers?.length ? (
                     office.twilioNumbers.map((t, i) => (
-                      <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-800/30 last:border-0">
+                      <div key={i} className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-100 last:border-0">
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-xs font-mono text-[#8EA7F0]">{t.number}</span>
-                          <span className="text-[10px] text-slate-500">{t.title}</span>
+                          <span className="text-xs font-mono text-[#274993]">{t.number}</span>
+                          <span className="text-[10px] text-slate-400">{t.title}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={cn(
                             'text-[10px] px-2 py-0.5 rounded-full border font-semibold',
                             t.disabled
-                              ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                              ? 'bg-red-50 text-red-600 border-red-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200',
                           )}>
                             {t.disabled ? 'Disabled' : 'Active'}
                           </span>
-                          <ExternalLink size={12} className="text-slate-700" />
+                          <ExternalLink size={12} className="text-slate-300" />
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="py-3 text-xs text-slate-600">No Twilio numbers provisioned</div>
+                    <div className="py-3 text-xs text-slate-400">No Twilio numbers provisioned</div>
                   )}
                 </Panel>
 

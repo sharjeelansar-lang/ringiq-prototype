@@ -18,6 +18,9 @@ export async function GET() {
       environmentStatus: o.officeStatus === 'active' ? 'live_production' : 'internal_testing',
       cpmid: o.ehr?.cpmid ?? '',
       timezone: o.tzName ?? '',
+      city: o.address?.city ?? '',
+      state: o.address?.state ?? '',
+      prospectPlan: o.prospectPlan ?? '',
       createdAt: o.createdAt
         ? new Date(o.createdAt).toISOString().split('T')[0]
         : '',
@@ -88,6 +91,18 @@ export async function POST(req: NextRequest) {
       operationalHours,
       internalWorkingHours,
       recordingDisclosure,
+      officeGreeting,
+      locationNote,
+      afterHoursPolicy,
+      onCallDoctorName,
+      onCallDoctorPhone,
+      phoneProvider,
+      billingDeptPhone,
+      medicalDeptPhone,
+      otherDeptPhone,
+      vapiVoiceId,
+      discontinueGreetings,
+      prospectPlan,
     } = body;
 
     const tzOffset = computeTzOffset(timezone);
@@ -133,6 +148,22 @@ export async function POST(req: NextRequest) {
         : {},
       servicePlan: 'dashboard-399',
       officeOpenHours: {},
+      officeGreeting:       officeGreeting       ?? '',
+      locationNote:         locationNote         ?? '',
+      afterHoursPolicy:     afterHoursPolicy     ?? '',
+      onCallDoctor: {
+        name:  onCallDoctorName  ?? '',
+        phone: onCallDoctorPhone ?? '',
+      },
+      phoneProvider:        phoneProvider        ?? '',
+      deptRouting: {
+        billing: billingDeptPhone ?? '',
+        medical: medicalDeptPhone ?? '',
+        other:   otherDeptPhone   ?? '',
+      },
+      vapiVoiceId:          vapiVoiceId          ?? 'aria',
+      discontinueGreetings: discontinueGreetings ?? false,
+      prospectPlan:         prospectPlan         ?? '',
       // EHR metadata stored for downstream integrations
       corporateCleanName: body.corporateCleanName ?? '',
       ehr: {

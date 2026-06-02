@@ -14,14 +14,27 @@ import {
 
 type ProspectData = {
   id: string;
-  practiceName: string;
-  contactName: string;
-  contactRole: string;
-  email: string;
-  phone: string;
-  city: string;
-  state: string;
-  plan: string;
+  practiceName:      string;
+  contactName:       string;
+  contactRole:       string;
+  email:             string;
+  phone:             string;
+  streetAddress:     string;
+  city:              string;
+  state:             string;
+  zipCode:           string;
+  timezone:          string;
+  ehrSystem:         string;
+  monthlyCallVolume: string;
+  phoneProvider:     string;
+  currentPhoneSetup: string;
+  officeGreeting:    string;
+  locationNote:      string;
+  officeHours:       Record<string, unknown>;
+  lunchBreak:        string;
+  afterHoursPolicy:  string;
+  voice:             string;
+  plan:              string;
 };
 
 import { Sidebar } from '@/components/dashboard/Sidebar';
@@ -126,18 +139,6 @@ function StepBar({ currentStep }: { currentStep: number }) {
   );
 }
 
-// ── Divider between merged sections ──────────────────────────────────────────
-
-function SectionDivider({ label }: { label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0' }}>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8' }}>{label}</span>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-    </div>
-  );
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 function NewBusinessContent() {
@@ -185,6 +186,18 @@ function NewBusinessContent() {
         sunday:       { open: '',      close: '',      closed: true  },
       },
       internalWorkingHours:  'Doctor Lunch Block: 12:00 PM - 01:00 PM',
+      officeGreeting:        '',
+      locationNote:          '',
+      afterHoursPolicy:      '',
+      onCallDoctorName:      '',
+      onCallDoctorPhone:     '',
+      phoneProvider:         '',
+      billingDeptPhone:      '',
+      medicalDeptPhone:      '',
+      otherDeptPhone:        '',
+      vapiVoiceId:           '',
+      discontinueGreetings:  false,
+      prospectPlan:          '',
       recordingDisclosure:   true,
       allowSameDayBookings:  false,
       maxSlotSearchRounds:   3,
@@ -214,8 +227,27 @@ function NewBusinessContent() {
           const digits = p.phone.replace(/\D/g, '');
           if (digits.length === 10) form.setValue('publicNumber', `+1${digits}`);
         }
-        if (p.city)  form.setValue('city',  p.city);
-        if (p.state) form.setValue('state', p.state);
+        if (p.streetAddress)   form.setValue('streetAddress',  p.streetAddress);
+        if (p.city)            form.setValue('city',           p.city);
+        if (p.state)           form.setValue('state',          p.state);
+        if (p.zipCode)         form.setValue('zipCode',        p.zipCode);
+        if (p.timezone)        form.setValue('timezone',       p.timezone);
+        if (p.lunchBreak)      form.setValue('internalWorkingHours', p.lunchBreak);
+        if (p.officeGreeting)  form.setValue('officeGreeting', p.officeGreeting);
+        if (p.locationNote)    form.setValue('locationNote',   p.locationNote);
+        if (p.afterHoursPolicy) form.setValue('afterHoursPolicy', p.afterHoursPolicy);
+        if (p.phoneProvider)   form.setValue('phoneProvider',  p.phoneProvider);
+        if (p.voice)           form.setValue('vapiVoiceId',    p.voice);
+        if (p.plan)            form.setValue('prospectPlan',   p.plan);
+        if (p.officeHours && typeof p.officeHours === 'object') {
+          const h = p.officeHours as Record<string, { open?: string; close?: string; closed?: boolean }>;
+          if (h.mondayFriday?.open)  form.setValue('operationalHours.mondayFriday.open',  h.mondayFriday.open);
+          if (h.mondayFriday?.close) form.setValue('operationalHours.mondayFriday.close', h.mondayFriday.close);
+          if (h.saturday?.open)      form.setValue('operationalHours.saturday.open',       h.saturday.open);
+          if (h.saturday?.close)     form.setValue('operationalHours.saturday.close',      h.saturday.close);
+          if (h.saturday?.closed !== undefined) form.setValue('operationalHours.saturday.closed', !!h.saturday.closed);
+          if (h.sunday?.closed !== undefined)   form.setValue('operationalHours.sunday.closed',   !!h.sunday.closed);
+        }
       })
       .catch(() => {})
       .finally(() => setProspectLoading(false));
@@ -233,13 +265,9 @@ function NewBusinessContent() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error ?? 'Unknown server error');
 
-      // Mark the queue prospect as approved now that setup is complete
+      // Remove the prospect from the queue now that it is a registered business
       if (prospectId) {
-        await fetch(`/api/queue/${prospectId}`, {
-          method:  'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ status: 'approved' }),
-        }).catch(() => {}); // non-critical
+        await fetch(`/api/queue/${prospectId}`, { method: 'DELETE' }).catch(() => {}); // non-critical
       }
 
       setCreatedId(json.officeId);
@@ -283,10 +311,6 @@ function NewBusinessContent() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center', maxWidth: 380 }}>
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <CheckCircle2 size={30} style={{ color: '#10B981' }} />
-            </div>
-            <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', margin: 0 }}>Business Registered</h2>
-              <p style={{ fontSize: 13, color: '#64748B', marginTop: 6 }}>Document created in MongoDB Atlas.</p>
             </div>
             <div style={{ width: '100%', padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)', background: 'rgba(16,185,129,0.04)', textAlign: 'left' }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 6 }}>MongoDB Office ID</p>
@@ -377,13 +401,13 @@ function NewBusinessContent() {
         <main style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <div style={{
             height: '100%', overflowY: 'auto',
-            maxWidth: 900, margin: '0 auto', width: '100%',
-            padding: step === 3 ? '20px 40px' : '32px 40px',
+            width: '100%',
+            padding: '16px 40px',
           }}>
             {/* Step title + progress */}
-            <div style={{ marginBottom: step === 3 ? 16 : 28 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>{STEPS[step].label}</h2>
-              <div style={{ marginTop: 12, height: 3, background: '#E2E8F0', borderRadius: 9, overflow: 'hidden', position: 'relative' }}>
+            <div style={{ marginBottom: 14 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>{STEPS[step].label}</h2>
+              <div style={{ marginTop: 10, height: 3, background: '#E2E8F0', borderRadius: 9, overflow: 'hidden', position: 'relative' }}>
                 <div style={{
                   position: 'absolute', inset: '0 auto 0 0',
                   background: '#274993', borderRadius: 9,
@@ -395,12 +419,39 @@ function NewBusinessContent() {
 
             <form id="business-form" onSubmit={form.handleSubmit(handleFinalSubmit)}>
               {step === 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <CoreBusinessSection form={form} />
-                  <SectionDivider label="EHR Integration" />
-                  <EHRMappingSection form={form} />
-                  <SectionDivider label="Phone Numbers" />
-                  <TelephonySection form={form} />
+                <div style={{
+                  background: '#FFFFFF', border: '1px solid #E8EEF4',
+                  borderRadius: 10, padding: '18px 20px',
+                  display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0 32px', alignItems: 'start',
+                }}>
+
+                  {/* Left — Practice Identity + EHR */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 10 }}>Practice Identity</p>
+                      <CoreBusinessSection form={form} />
+                    </div>
+                    <div style={{ height: 1, background: '#EEF2F8' }} />
+                    <div>
+                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 10 }}>EHR Integration</p>
+                      <EHRMappingSection form={form} />
+                    </div>
+                  </div>
+
+                  {/* Vertical divider */}
+                  <div style={{ display: 'contents' }}>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        position: 'absolute', top: 0, bottom: 0, left: -16,
+                        width: 1, background: '#EEF2F8',
+                      }} />
+                      <div>
+                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: 14 }}>Phone Numbers & Routing</p>
+                        <TelephonySection form={form} />
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               )}
               {step === 1 && <ProvisioningSection form={form} />}

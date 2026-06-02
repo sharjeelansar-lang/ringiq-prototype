@@ -25,16 +25,26 @@ export async function GET(
         contactRole:       item.contactRole       ?? '',
         email:             item.email             ?? '',
         phone:             item.phone             ?? '',
+        streetAddress:     item.streetAddress     ?? '',
         city:              item.city              ?? '',
         state:             item.state             ?? '',
+        zipCode:           item.zipCode           ?? '',
+        timezone:          item.timezone          ?? '',
         locationCount:     item.locationCount     ?? '',
         ehrSystem:         item.ehrSystem         ?? '',
         monthlyCallVolume: item.monthlyCallVolume ?? '',
+        phoneProvider:     item.phoneProvider     ?? '',
         currentPhoneSetup: item.currentPhoneSetup ?? '',
+        officeGreeting:    item.officeGreeting    ?? '',
+        locationNote:      item.locationNote      ?? '',
+        officeHours:       item.officeHours       ?? {},
+        lunchBreak:        item.lunchBreak        ?? '',
+        afterHoursPolicy:  item.afterHoursPolicy  ?? '',
+        voice:             item.voice             ?? '',
         interests:         Array.isArray(item.interests) ? item.interests : [],
-        notes:             item.notes ?? '',
-        plan:              item.plan  ?? '',
-        status:            item.status ?? 'pending',
+        notes:             item.notes             ?? '',
+        plan:              item.plan              ?? '',
+        status:            item.status            ?? 'pending',
         createdAt:         item.createdAt ? new Date(item.createdAt).toISOString() : '',
       },
     });
@@ -53,7 +63,7 @@ export async function PATCH(
     const body = await req.json();
     const { status } = body;
 
-    if (!['pending', 'approved', 'rejected'].includes(status)) {
+    if (!['pending', 'rejected'].includes(status)) {
       return NextResponse.json(
         { success: false, error: 'Invalid status value' },
         { status: 400 },
@@ -84,5 +94,32 @@ export async function PATCH(
       { success: false, error: 'Failed to update status' },
       { status: 500 },
     );
+  }
+}
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    let oid: ObjectId;
+    try { oid = new ObjectId(id); }
+    catch { return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 }); }
+
+    const db = await getDb();
+    const result = await db.collection('queue').deleteOne({ _id: oid });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Record not found' },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('[DELETE /api/queue/[id]] Error:', err);
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
   }
 }
