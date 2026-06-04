@@ -14,7 +14,15 @@
 
   /* Brand */
   --primary:                #274993;   /* RingIQ blue */
+  --primary-dark:           #1D3870;
   --primary-foreground:     #FFFFFF;
+
+  /* Extended palette */
+  --accent-border:          #D8E5FF;
+  --teal:                   #0D9488;
+  --mid:                    #334155;
+  --light:                  #94A3B8;
+  --input-bg:               #F8FAFC;
 
   /* Neutral surfaces */
   --secondary:              #F1F5F9;   /* slate-100 */
@@ -43,7 +51,13 @@
   --color-popover:                var(--popover);
   --color-popover-foreground:     var(--popover-foreground);
   --color-primary:                var(--primary);
+  --color-primary-dark:           var(--primary-dark);
   --color-primary-foreground:     var(--primary-foreground);
+  --color-accent-border:          var(--accent-border);
+  --color-teal:                   var(--teal);
+  --color-mid:                    var(--mid);
+  --color-light:                  var(--light);
+  --color-input-bg:               var(--input-bg);
   --color-secondary:              var(--secondary);
   --color-secondary-foreground:   var(--secondary-foreground);
   --color-muted:                  var(--muted);
@@ -129,3 +143,4 @@ input:-webkit-autofill:active {
   0%, 100% { box-shadow: 0 0 12px rgba(39,73,147,0.15); }
   50%       { box-shadow: 0 0 28px rgba(39,73,147,0.35); }
 }
+
