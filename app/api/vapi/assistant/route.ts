@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
       syeLocationId,
       recordingDisclosure,
       allowSameDayBookings,
-    } = body as PromptContext;
+      vapiVoiceId,
+    } = body as PromptContext & { vapiVoiceId?: string };
 
     if (!practiceDisplayName?.trim()) {
       return NextResponse.json(
@@ -70,7 +71,8 @@ export async function POST(req: NextRequest) {
         },
         voice: {
           provider: 'vapi',
-          voiceId: 'Savannah',
+          voiceId: vapiVoiceId ?? 'Savannah',
+          version: 2,
         },
         firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
       }),

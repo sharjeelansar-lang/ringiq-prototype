@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
         medical: medicalDeptPhone ?? '',
         other:   otherDeptPhone   ?? '',
       },
-      vapiVoiceId:          vapiVoiceId          ?? 'aria',
+      vapiVoiceId:          vapiVoiceId          ?? 'Savannah',
       discontinueGreetings: discontinueGreetings ?? false,
       prospectPlan:         prospectPlan         ?? '',
       // EHR metadata stored for downstream integrations
