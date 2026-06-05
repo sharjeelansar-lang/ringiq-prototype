@@ -39,6 +39,7 @@ export interface TwilioProvisionResult {
 
 interface Props {
   practiceName: string;
+  failoverNumber?: string;
   onProvisioned: (result: TwilioProvisionResult) => void;
   onSkip: () => void;
 }
@@ -78,7 +79,7 @@ function StepBadge({ n, done, active }: { n: number; done: boolean; active: bool
 
 // ── Main widget ───────────────────────────────────────────────────────────────
 
-export function TwilioProvisioningWidget({ practiceName, onProvisioned, onSkip }: Props) {
+export function TwilioProvisioningWidget({ practiceName, failoverNumber, onProvisioned, onSkip }: Props) {
   const [subAccount,     setSubAccount]     = useState<SubAccount | null>(null);
   const [subLoading,     setSubLoading]     = useState(false);
   const [subError,       setSubError]       = useState('');
@@ -165,6 +166,7 @@ export function TwilioProvisioningWidget({ practiceName, onProvisioned, onSkip }
           friendlyName:    practiceName || selectedNumber.friendlyName,
           subAccountSid:   subAccount?.sid,
           subAccountToken: subAccount?.authToken,
+          failoverNumber:  failoverNumber || '',
         }),
       });
       const json = await res.json();

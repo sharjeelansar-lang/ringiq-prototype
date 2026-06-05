@@ -19,7 +19,9 @@ interface OfficeDetail {
   officeStatus: string;
   tzName: string;
   tzOffset: number;
-  publicNumber: string;
+  phone: string;
+  officeLine2?: string;
+  officeLine3?: string;
   servicePlan: string;
   skipRecordingMessage: boolean;
   createdAt: string;
@@ -307,7 +309,9 @@ export default function OfficeDetailPage() {
                   {office.twilioNumbers?.[0]?.sid && (
                     <DataRow label="Twilio SID" value={office.twilioNumbers[0].sid} mono />
                   )}
-                  <DataRow label="Public Transfer" value={office.publicNumber} mono />
+                  <DataRow label="Practice Phone"  value={office.phone}        mono />
+                  <DataRow label="Office Line 2"   value={office.officeLine2}  mono />
+                  <DataRow label="Office Line 3"   value={office.officeLine3}  mono />
                   <DataRow label="Skip Recording"  value={office.skipRecordingMessage ? 'Yes' : 'No'} />
                 </Panel>
 

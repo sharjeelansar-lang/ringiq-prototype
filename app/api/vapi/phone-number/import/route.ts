@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { phoneNumber, twilioAccountSid, twilioAuthToken, assistantId } = await req.json();
+    const { phoneNumber, twilioAccountSid, twilioAuthToken, assistantId, practiceName } = await req.json();
 
     if (!phoneNumber || !twilioAccountSid || !twilioAuthToken || !assistantId) {
       return NextResponse.json(
@@ -30,11 +30,11 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         provider: 'twilio',
-        number: e164,          
+        number: e164,
         twilioAccountSid,
         twilioAuthToken,
         assistantId,
-        name: 'VAPI AI Line',
+        name: practiceName ? `${practiceName} — Iris` : 'Iris',
       }),
     });
 

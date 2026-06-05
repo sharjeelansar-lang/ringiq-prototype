@@ -24,57 +24,42 @@ export function TelephonySection({ form }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-      {/* Tracking numbers */}
-      <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+      <div className="grid grid-cols-1 gap-y-4">
         <FormField
-          label="Inbound Tracking Number"
-          required
-          error={errors.inboundPhone?.message}
-          hint="Main RingIQ tracking line"
+          label="Practice Phone"
+          error={errors.phone?.message}
+          hint="Main number patients call"
         >
           <Input
-            {...register('inboundPhone')}
-            placeholder="2313896122"
-            error={!!errors.inboundPhone}
+            {...register('phone')}
+            placeholder="+12025550001"
+            error={!!errors.phone}
             className="font-mono"
           />
         </FormField>
 
         <FormField
-          label="VAPI AI Assistant Number"
-          error={errors.vapiAssistantPhoneNumber?.message}
-          hint="VAPI line (answers on 4th ring)"
+          label="Office Line 2 — Staff / 3rd-ring pickup"
+          error={errors.officeLine2?.message}
+          hint="Staff direct line — forwarded after ring threshold"
         >
           <Input
-            {...register('vapiAssistantPhoneNumber')}
-            placeholder="2313899335"
-            error={!!errors.vapiAssistantPhoneNumber}
+            {...register('officeLine2')}
+            placeholder="+12025550002"
+            error={!!errors.officeLine2}
             className="font-mono"
           />
         </FormField>
 
         <FormField
-          label="Public Transfer Number"
-          error={errors.publicNumber?.message}
-          hint="Office public number shown to callers"
+          label="Office Line 3 — AI transfer line"
+          error={errors.officeLine3?.message}
+          hint="Line Iris transfers calls to when caller requests staff"
         >
           <Input
-            {...register('publicNumber')}
-            placeholder="+12488792388"
-            error={!!errors.publicNumber}
-            className="font-mono"
-          />
-        </FormField>
-
-        <FormField
-          label="Failover Transfer Number"
-          error={errors.failoverTransferNumber?.message}
-          hint="E.164 — forwarded after ring threshold"
-        >
-          <Input
-            {...register('failoverTransferNumber')}
-            placeholder="+15869916560"
-            error={!!errors.failoverTransferNumber}
+            {...register('officeLine3')}
+            placeholder="+12025550003"
+            error={!!errors.officeLine3}
             className="font-mono"
           />
         </FormField>
@@ -91,43 +76,6 @@ export function TelephonySection({ form }: Props) {
           placeholder="RingCentral"
         />
       </FormField>
-
-      <SubHeader label="Department Routing" />
-
-      <div className="grid grid-cols-3 gap-x-5 gap-y-4">
-        <FormField
-          label="Billing Dept. Number"
-          hint="Direct billing line"
-        >
-          <Input
-            {...register('billingDeptPhone')}
-            placeholder="+12485550100"
-            className="font-mono"
-          />
-        </FormField>
-
-        <FormField
-          label="Medical Records Number"
-          hint="Records requests line"
-        >
-          <Input
-            {...register('medicalDeptPhone')}
-            placeholder="+12485550101"
-            className="font-mono"
-          />
-        </FormField>
-
-        <FormField
-          label="Other Dept. Number"
-          hint="Additional routing"
-        >
-          <Input
-            {...register('otherDeptPhone')}
-            placeholder="+12485550102"
-            className="font-mono"
-          />
-        </FormField>
-      </div>
 
     </div>
   );

@@ -47,10 +47,11 @@ function OnboardContent() {
 
   const validatePractice = () => {
     const e: Record<string, string> = {};
-    if (s1.practiceName.trim().length < 2)              e.practiceName = 'Practice name is required';
-    if (!s1.contactName.trim())                         e.contactName  = 'Your name is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s1.email))  e.email        = 'Enter a valid email address';
-    if (!/^\d{10}$/.test(s1.phone.replace(/\D/g, ''))) e.phone        = 'Enter a valid 10-digit phone number';
+    if (s1.practiceName.trim().length < 2)                        e.practiceName = 'Practice name is required';
+    if (!s1.contactName.trim())                                   e.contactName  = 'Your name is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s1.email))            e.email        = 'Enter a valid email address';
+    if (!/^\d{10}$/.test(s1.phone.replace(/\D/g, '')))           e.phone        = 'Enter a valid 10-digit phone number';
+    if (plan === 'backup' && !s1.officeLine2.replace(/\D/g, '')) e.officeLine2  = 'Required for 3-Ring Backup — enter your staff pickup line';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -191,7 +192,7 @@ function OnboardContent() {
                 )}
               </>
             )}
-            {step === practiceStep && <Step1Form data={s1} onChange={setS1} errors={errors} />}
+            {step === practiceStep && <Step1Form data={s1} onChange={setS1} errors={errors} plan={plan} />}
             {step === setupStep    && <Step2Form data={s2} onChange={setS2} errors={errors} />}
             {step === officeStep   && <Step3Form data={s3} onChange={setS3} errors={errors} />}
             {step === goalsStep    && <Step4Form data={s4} toggle={toggleInterest} onChange={setS4} />}

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTwilioMainClient, getTwilioSubClient } from '@/lib/twilio';
 
+const VAPI_VOICE_URL   = 'https://api.vapi.ai/twilio/inbound_call';
+const VAPI_STATUS_URL  = 'https://api.vapi.ai/twilio/status';
+
 export async function POST(req: NextRequest) {
   try {
-    const { phoneNumber, friendlyName, subAccountSid, subAccountToken } = await req.json();
+    const { phoneNumber, friendlyName, subAccountSid, subAccountToken, failoverNumber } = await req.json();
 
     if (!phoneNumber) {
       return NextResponse.json(
@@ -36,6 +39,23 @@ export async function POST(req: NextRequest) {
     const purchased = await client.incomingPhoneNumbers.create({
       phoneNumber,
       friendlyName: friendlyName ?? phoneNumber,
+    });
+
+    // Normalise failover to E.164 for twimlets fallback
+    const failoverE164 = failoverNumber
+      ? (String(failoverNumber).startsWith('+') ? failoverNumber : `+1${String(failoverNumber).replace(/\D/g, '')}`)
+      : null;
+
+    const fallbackUrl = failoverE164 ? `http://twimlets.com/forward?PhoneNumber=${failoverE164}` : '';
+
+    // Configure VAPI webhooks on the number immediately after purchase
+    await client.incomingPhoneNumbers(purchased.sid).update({
+      voiceUrl:             VAPI_VOICE_URL,
+      voiceMethod:          'POST',
+      voiceFallbackUrl:     fallbackUrl,
+      voiceFallbackMethod:  'POST',
+      statusCallback:       VAPI_STATUS_URL,
+      statusCallbackMethod: 'POST',
     });
 
     return NextResponse.json({

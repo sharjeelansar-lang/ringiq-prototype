@@ -4,11 +4,12 @@ import { type S1 } from '@/types/onboard';
 import { ObField, ObInput } from '@/components/onboard/ObField/ObField';
 
 export function Step1Form({
-  data, onChange, errors,
+  data, onChange, errors, plan,
 }: {
-  data: S1; onChange: (d: S1) => void; errors: Record<string, string>;
+  data: S1; onChange: (d: S1) => void; errors: Record<string, string>; plan?: string;
 }) {
   const u = (k: keyof S1) => (v: string) => onChange({ ...data, [k]: v });
+  const line2Required = plan === 'backup';
   return (
     <div className="ob-fields">
       <ObField label="Practice Name" error={errors.practiceName}>
@@ -28,14 +29,18 @@ export function Step1Form({
 
       <div>
         <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--mid)', marginBottom: 4 }}>
-          Additional Phone Lines <span style={{ fontWeight: 400, color: 'var(--light)' }}>(optional)</span>
+          Additional Phone Lines{' '}
+          {line2Required
+            ? <span style={{ fontWeight: 600, color: 'var(--teal)', fontSize: 12 }}>Line 2 required for 3-Ring Backup</span>
+            : <span style={{ fontWeight: 400, color: 'var(--light)' }}>(optional)</span>
+          }
         </p>
         <p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 10, lineHeight: 1.5 }}>
           These lines help Iris route calls correctly. Lines can be direct-dial or Main + extension.
         </p>
         <div className="ob-row-2">
-          <ObField label="Office Line 2 — Staff / 3rd-ring pickup">
-            <ObInput value={data.officeLine2} onChange={u('officeLine2')} placeholder="(208) 555-0102 or ext. 2" type="tel" />
+          <ObField label={`Office Line 2 — Staff / 3rd-ring pickup${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
+            <ObInput value={data.officeLine2} onChange={u('officeLine2')} placeholder="(208) 555-0102 or ext. 2" type="tel" hasError={!!errors.officeLine2} />
           </ObField>
           <ObField label="Office Line 3 — AI transfer line">
             <ObInput value={data.officeLine3} onChange={u('officeLine3')} placeholder="(208) 555-0103 or ext. 3" type="tel" />

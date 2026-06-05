@@ -41,7 +41,7 @@ export function ObSelect({
   value, onChange, options, placeholder, hasError,
 }: {
   value: string; onChange: (v: string) => void;
-  options: readonly string[] | string[];
+  options: readonly (string | { value: string; label: string })[];
   placeholder?: string; hasError?: boolean;
 }) {
   return (
@@ -54,9 +54,13 @@ export function ObSelect({
         {placeholder && (
           <option value="" style={{ color: 'var(--light)' }}>{placeholder}</option>
         )}
-        {options.map((o) => (
-          <option key={o} value={o} style={{ color: 'var(--foreground)' }}>{o}</option>
-        ))}
+        {options.map((o) => {
+          const val = typeof o === 'string' ? o : o.value;
+          const lbl = typeof o === 'string' ? o : o.label;
+          return (
+            <option key={val} value={val} style={{ color: 'var(--foreground)' }}>{lbl}</option>
+          );
+        })}
       </select>
       <ChevronDown
         size={14}

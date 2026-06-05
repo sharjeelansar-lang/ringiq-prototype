@@ -8,7 +8,8 @@ interface Props { form: UseFormReturn<BusinessFormSchema>; }
 
 export function ProvisioningSection({ form }: Props) {
   const { watch, setValue } = form;
-  const practiceName = watch('practiceDisplayName');
+  const practiceName  = watch('practiceDisplayName');
+  const failoverNumber = watch('officeLine2');
 
   const handleProvisioned = (result: TwilioProvisionResult) => {
     const digits = result.purchasedNumber.phoneNumber.replace(/\D/g, '').slice(-10);
@@ -36,6 +37,7 @@ export function ProvisioningSection({ form }: Props) {
     <div className="w-full">
       <TwilioProvisioningWidget
         practiceName={practiceName}
+        failoverNumber={failoverNumber}
         onProvisioned={handleProvisioned}
         onSkip={() => {}}
       />

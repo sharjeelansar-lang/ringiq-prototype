@@ -106,7 +106,7 @@ export function BusinessRegistrationForm({ onClose, onSubmit }: Props) {
       cpmid: '',
       syeLocationId: 8,
       inboundPhone: '',
-      publicNumber: '',
+      phone: '',
       twilioSid: '',
       carrierTrunkName: '',
       failoverRingCount: 3,
