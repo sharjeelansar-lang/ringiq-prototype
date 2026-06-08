@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, Clock, Building2, MoreVertical, Pencil, Trash2, Phone, X, Loader2 } from 'lucide-react';
+import { CheckCircle2, Building2, MoreVertical, Pencil, Trash2, Phone, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MockBusiness } from '@/types/business';
 
@@ -298,27 +298,15 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
 
               {/* Status badge */}
               <div>
-                {biz.environmentStatus === 'live_production' ? (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
-                    background: 'rgba(16,185,129,0.08)', color: '#059669',
-                    border: '1px solid rgba(16,185,129,0.2)',
-                  }}>
-                    <CheckCircle2 size={10} />
-                    Live
-                  </span>
-                ) : (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
-                    background: 'rgba(245,158,11,0.08)', color: '#D97706',
-                    border: '1px solid rgba(245,158,11,0.2)',
-                  }}>
-                    <Clock size={10} />
-                    Testing
-                  </span>
-                )}
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+                  background: 'rgba(16,185,129,0.08)', color: '#059669',
+                  border: '1px solid rgba(16,185,129,0.2)',
+                }}>
+                  <CheckCircle2 size={10} />
+                  Active
+                </span>
               </div>
 
               {/* Timezone */}

@@ -12,23 +12,27 @@ export function ProvisioningSection({ form }: Props) {
   const failoverNumber = watch('officeLine2');
 
   const handleProvisioned = (result: TwilioProvisionResult) => {
-    const digits = result.purchasedNumber.phoneNumber.replace(/\D/g, '').slice(-10);
-    const sid    = result.subAccount?.sid ?? '';
-    const token  = result.subAccount?.authToken ?? '';
+    const twilioDigits = result.twilioNumber.phoneNumber.replace(/\D/g, '').slice(-10);
+    const vapiDigits   = result.vapiNumber.phoneNumber.replace(/\D/g, '').slice(-10);
+    const sid          = result.subAccount?.sid ?? '';
+    const token        = result.subAccount?.authToken ?? '';
 
-    setValue('inboundPhone',             digits, { shouldValidate: true });
-    setValue('twilioSid',                result.purchasedNumber.sid, { shouldValidate: true });
-    setValue('twilioSubAccountSid',      sid,    { shouldValidate: false });
-    setValue('twilioSubAccountToken',    token,  { shouldValidate: false });
-    setValue('vapiAssistantPhoneNumber', digits, { shouldValidate: false });
+    // inboundPhone = main routing number (office forwards their public # here)
+    setValue('inboundPhone',             twilioDigits, { shouldValidate: true });
+    setValue('twilioSid',                result.twilioNumber.sid, { shouldValidate: false });
+    setValue('twilioSubAccountSid',      sid,   { shouldValidate: false });
+    setValue('twilioSubAccountToken',    token, { shouldValidate: false });
+    // vapiAssistantPhoneNumber = AI agent line (imported into VAPI in the next step)
+    setValue('vapiAssistantPhoneNumber', vapiDigits, { shouldValidate: false });
 
-    // Persist to localStorage so the VAPI step can read it even if watch() misses the update
     try {
       localStorage.setItem('ringiq_twilio_creds', JSON.stringify({
         subAccountSid:   sid,
         subAccountToken: token,
-        inboundPhone:    digits,
-        twilioSid:       result.purchasedNumber.sid,
+        inboundPhone:    twilioDigits,
+        twilioSid:       result.twilioNumber.sid,
+        vapiPhone:       vapiDigits,
+        vapiNumberSid:   result.vapiNumber.sid,
       }));
     } catch { /* storage not available */ }
   };

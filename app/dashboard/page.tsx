@@ -175,12 +175,12 @@ export default function DashboardOverview() {
                       </div>
                       <span style={{
                         fontSize: 10, padding: '2px 8px', borderRadius: 100,
-                        background: b.environmentStatus === 'live_production' ? T.tealFd : T.amberFd,
-                        border: `1px solid ${b.environmentStatus === 'live_production' ? T.tealBd : T.amberBd}`,
-                        color: b.environmentStatus === 'live_production' ? T.teal : T.amber,
+                        background: T.tealFd,
+                        border: `1px solid ${T.tealBd}`,
+                        color: T.teal,
                         fontWeight: 600, letterSpacing: '0.04em',
                       }}>
-                        {b.environmentStatus === 'live_production' ? 'Live' : 'Testing'}
+                        Active
                       </span>
                     </div>
                   ))}

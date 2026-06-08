@@ -313,12 +313,12 @@ export default function QueuePage() {
                     <div style={{ fontSize: 11, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>{formatDate(o.createdAt)}</div>
                     <div>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
-                        background: o.environmentStatus === 'live_production' ? T.greenFd : T.amberFd,
-                        border: `1px solid ${o.environmentStatus === 'live_production' ? T.greenBd : T.amberBd}`,
-                        color: o.environmentStatus === 'live_production' ? T.green : T.amber,
+                        background: T.greenFd,
+                        border: `1px solid ${T.greenBd}`,
+                        color: T.green,
                       }}>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: o.environmentStatus === 'live_production' ? T.green : T.amber, display: 'block' }} />
-                        {o.environmentStatus === 'live_production' ? 'Live' : 'Testing'}
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: T.green, display: 'block' }} />
+                        Approved
                       </span>
                     </div>
                   </div>
