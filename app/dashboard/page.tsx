@@ -111,7 +111,7 @@ export default function DashboardOverview() {
         <main style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
           {/* Stat tiles */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          <div className="dash-stats">
             {stats.map(({ label, value, icon: Icon, color, loading }) => (
               <div key={label} style={{ background: T.surface, borderRadius: 14, border: `1.5px solid ${T.border}`, padding: '20px 22px', display: 'flex', alignItems: 'flex-start', gap: 14 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 9, background: T.bg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -128,7 +128,7 @@ export default function DashboardOverview() {
           </div>
 
           {/* Two-column sections */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="dash-two-col">
 
             {/* Registered Businesses */}
             <div style={{ background: T.surface, borderRadius: 14, border: `1.5px solid ${T.border}`, overflow: 'hidden' }}>

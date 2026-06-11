@@ -4,6 +4,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { BusinessFormSchema } from '@/lib/schema';
 import { TIMEZONES, US_STATES } from '@/lib/utils';
 import { FormField, Input, Select } from '@/components/ui/FormField';
+import { SubHeader } from '@/components/ui/SubHeader';
 import type { FieldPath } from 'react-hook-form';
 
 const STATE_OPTIONS = US_STATES.map((s) => ({ value: s, label: s }));
@@ -22,18 +23,6 @@ const DAYS = [
   { key: 'saturday',     label: 'Saturday',  canClose: true  },
   { key: 'sunday',       label: 'Sunday',    canClose: true  },
 ] as const;
-
-function SubHeader({ label }: { label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8' }}>
-        {label}
-      </span>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-    </div>
-  );
-}
 
 interface Props { form: UseFormReturn<BusinessFormSchema>; }
 

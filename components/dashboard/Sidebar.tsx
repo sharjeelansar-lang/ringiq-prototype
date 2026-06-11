@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Building2, Inbox, Settings, ChevronRight, LogOut } from 'lucide-react';
+import { LayoutDashboard, Building2, Inbox, Settings, ChevronRight, LogOut, Menu, X } from 'lucide-react';
 
 const T = {
   bg:     '#FFFFFF',
@@ -31,6 +31,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [user,         setUser]         = useState<{ name: string; email: string } | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const [mobileOpen,   setMobileOpen]   = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -82,10 +83,65 @@ export function Sidebar() {
   ];
 
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', width: 240, minHeight: '100vh', background: T.bg, borderRight: `1px solid ${T.border}`, flexShrink: 0 }}>
+    <>
+      <style>{`
+        .dash-sidebar {
+          display: flex; flex-direction: column; width: 240px; min-height: 100vh;
+          background: #FFFFFF; border-right: 1px solid #E2E8F0; flex-shrink: 0;
+          transition: transform 0.25s ease;
+        }
+        .dash-mob-btn {
+          display: none;
+          position: fixed; top: 16px; left: 14px; z-index: 200;
+          width: 36px; height: 36px; border-radius: 8px;
+          background: rgba(247,246,243,0.95);
+          border: 1.5px solid #E2E8F0;
+          align-items: center; justify-content: center;
+          cursor: pointer; color: #64748B;
+          box-shadow: 0 2px 8px rgba(15,23,42,0.10);
+          padding: 0;
+        }
+        .dash-overlay {
+          display: none; position: fixed; inset: 0;
+          background: rgba(15,23,42,0.38);
+          backdrop-filter: blur(2px); z-index: 198;
+        }
+        @media (max-width: 900px) {
+          .dash-sidebar {
+            position: fixed; top: 0; left: 0; height: 100dvh; z-index: 199;
+            transform: translateX(-100%);
+            box-shadow: 4px 0 28px rgba(15,23,42,0.14);
+          }
+          .dash-sidebar.mob-open { transform: translateX(0); }
+          .dash-mob-btn { display: flex; }
+          .dash-overlay.mob-open { display: block; }
+          .dash-sidebar-close { display: block !important; }
+        }
+      `}</style>
+
+      <button className="dash-mob-btn" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+        <Menu size={16} />
+      </button>
+
+      <div
+        className={`dash-overlay${mobileOpen ? ' mob-open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+    <aside className={`dash-sidebar${mobileOpen ? ' mob-open' : ''}`}>
       {/* Logo */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '14px 18px 12px', borderBottom: `1px solid ${T.border}` }}>
-        <img src="/assets/logo.png" alt="RingIQ" style={{ height: 26, width: 'auto', objectFit: 'contain', objectPosition: 'left' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <img src="/assets/logo.png" alt="RingIQ" style={{ height: 26, width: 'auto', objectFit: 'contain', objectPosition: 'left' }} />
+          <button
+            onClick={() => setMobileOpen(false)}
+            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: T.light, padding: 4, borderRadius: 6 }}
+            className="dash-sidebar-close"
+            aria-label="Close menu"
+          >
+            <X size={16} />
+          </button>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981', display: 'block' }} />
           <span style={{ fontSize: 10, color: T.light, fontFamily: 'var(--font-geist-mono)' }}>console v2.4</span>
@@ -141,5 +197,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

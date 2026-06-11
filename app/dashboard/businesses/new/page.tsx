@@ -97,8 +97,9 @@ const STEP_SCHEMAS = [
 function StepBar({ currentStep }: { currentStep: number }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', padding: '10px 32px',
+      display: 'flex', alignItems: 'center', padding: '10px 20px',
       borderBottom: '1px solid #E2E8F0', background: '#FFFFFF', flexShrink: 0,
+      overflowX: 'auto',
     }}>
       {STEPS.map((s, i) => {
         const done   = i < currentStep;
@@ -427,10 +428,9 @@ function NewBusinessContent() {
 
             <form id="business-form" onSubmit={form.handleSubmit(handleFinalSubmit)}>
               {step === 0 && (
-                <div style={{
+                <div className="dash-form-grid" style={{
                   background: '#FFFFFF', border: '1px solid #E8EEF4',
                   borderRadius: 10, padding: '18px 20px',
-                  display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0 32px', alignItems: 'start',
                 }}>
 
                   {/* Left — Practice Identity + EHR */}

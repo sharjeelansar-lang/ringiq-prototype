@@ -238,7 +238,7 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
         <div style={{
           display: 'grid', gridTemplateColumns: COLS, gap: 16,
           padding: '10px 20px', borderBottom: `1px solid ${T.border}`,
-          background: T.bg,
+          background: T.bg, minWidth: 640,
         }}>
           {['Practice Name', 'Clean Name', 'Status', 'Timezone', 'Created', ''].map(h => (
             <span key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.light }}>
@@ -267,7 +267,7 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
               onClick={() => router.push(`/dashboard/offices/${biz.mongoOfficeId}`)}
               style={{
                 display: 'grid', gridTemplateColumns: COLS, gap: 16,
-                alignItems: 'center', padding: '13px 20px',
+                alignItems: 'center', padding: '13px 20px', minWidth: 640,
                 cursor: 'pointer', transition: 'background 0.12s',
                 borderBottom: idx !== businesses.length - 1 ? `1px solid ${T.border}` : 'none',
                 borderLeft: '2.5px solid transparent',

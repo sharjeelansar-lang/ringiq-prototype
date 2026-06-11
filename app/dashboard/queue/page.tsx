@@ -289,7 +289,7 @@ export default function QueuePage() {
                 <p style={{ fontSize: 13, color: T.muted, margin: 0 }}>Businesses appear here once their setup wizard is completed.</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
+              <div className="dash-overflow"><div style={{ display: 'flex', flexDirection: 'column', gap: 0, borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden', minWidth: 700 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.1fr 1fr 100px 120px', gap: 16, padding: '10px 20px', borderBottom: `1px solid ${T.border}`, background: T.bg }}>
                   {['Practice', 'Location', 'Plan', 'CPMID', 'Enrolled', 'Status'].map((h) => (
                     <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.light }}>{h}</div>
@@ -323,7 +323,7 @@ export default function QueuePage() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div></div>
             )
           )}
 
@@ -342,7 +342,7 @@ export default function QueuePage() {
                 </p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
+              <div className="dash-overflow"><div style={{ display: 'flex', flexDirection: 'column', gap: 0, borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden', minWidth: 780 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.4fr 1fr 1.1fr 1fr 100px 120px', gap: 16, padding: '10px 20px', borderBottom: `1px solid ${T.border}`, background: T.bg }}>
                   {['Practice', 'Contact', 'Location', 'Plan', 'EHR', 'Applied', 'Status'].map((h) => (
                     <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.light }}>{h}</div>
@@ -382,7 +382,7 @@ export default function QueuePage() {
 
                       {isExpanded && (
                         <div style={{ padding: '0 20px 20px', borderTop: `1px solid ${T.border}`, background: T.bg, animation: 'fade-up .2s ease-out both' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, padding: '20px 0 20px' }}>
+                          <div className="dash-three-col" style={{ padding: '20px 0 20px' }}>
                             <div style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, padding: '16px 18px' }}>
                               <p style={{ fontSize: 10, fontWeight: 700, color: T.muted, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 12px' }}>Contact</p>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -485,7 +485,7 @@ export default function QueuePage() {
                     </div>
                   );
                 })}
-              </div>
+              </div></div>
             )
           )}
         </main>

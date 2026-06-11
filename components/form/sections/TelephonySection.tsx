@@ -3,20 +3,9 @@
 import { UseFormReturn } from 'react-hook-form';
 import { BusinessFormSchema } from '@/lib/schema';
 import { FormField, Input } from '@/components/ui/FormField';
+import { SubHeader } from '@/components/ui/SubHeader';
 
 interface Props { form: UseFormReturn<BusinessFormSchema>; }
-
-function SubHeader({ label }: { label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8' }}>
-        {label}
-      </span>
-      <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
-    </div>
-  );
-}
 
 export function TelephonySection({ form }: Props) {
   const { register, formState: { errors } } = form;

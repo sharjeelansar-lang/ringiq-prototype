@@ -233,7 +233,7 @@ export default function OfficeDetailPage() {
             <div className="flex flex-col gap-5">
 
               {/* ── Hero strip — key identifiers at a glance ── */}
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {/* Primary phone */}
                 <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 shrink-0">
@@ -284,7 +284,7 @@ export default function OfficeDetailPage() {
               </div>
 
               {/* ── Detail panels ── */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <Panel title="Core Business" icon={Building2} accent="cyan">
                   <DataRow label="Display Name"  value={office.name} />

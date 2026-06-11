@@ -329,7 +329,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Two-column cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="dash-two-col" style={{ gap: 16 }}>
 
               {/* Profile card */}
               <Card
