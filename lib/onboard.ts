@@ -46,14 +46,14 @@ export function vapiVoiceId(slug: string): string {
 }
 
 // ── Form options ──────────────────────────────────────────────────────────────
-export const US_TIMEZONES = [
-  'Eastern Time (ET)',
-  'Central Time (CT)',
-  'Mountain Time (MT)',
-  'Mountain Time – Arizona',
-  'Pacific Time (PT)',
-  'Alaska Time (AKT)',
-  'Hawaii Time (HT)',
+export const US_TIMEZONES: { value: string; label: string }[] = [
+  { value: 'America/New_York',    label: 'Eastern Time (ET)'       },
+  { value: 'America/Chicago',     label: 'Central Time (CT)'       },
+  { value: 'America/Denver',      label: 'Mountain Time (MT)'      },
+  { value: 'America/Phoenix',     label: 'Mountain Time – Arizona' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)'       },
+  { value: 'America/Anchorage',   label: 'Alaska Time (AKT)'       },
+  { value: 'Pacific/Honolulu',    label: 'Hawaii Time (HT)'        },
 ];
 
 export const PHONE_PROVIDERS = [

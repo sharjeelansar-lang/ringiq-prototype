@@ -19,7 +19,9 @@ interface OfficeDetail {
   officeStatus: string;
   tzName: string;
   tzOffset: number;
-  publicNumber: string;
+  phone: string;
+  officeLine2?: string;
+  officeLine3?: string;
   servicePlan: string;
   skipRecordingMessage: boolean;
   createdAt: string;
@@ -231,7 +233,7 @@ export default function OfficeDetailPage() {
             <div className="flex flex-col gap-5">
 
               {/* ── Hero strip — key identifiers at a glance ── */}
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {/* Primary phone */}
                 <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-slate-200 bg-white shadow-sm">
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 shrink-0">
@@ -282,7 +284,7 @@ export default function OfficeDetailPage() {
               </div>
 
               {/* ── Detail panels ── */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <Panel title="Core Business" icon={Building2} accent="cyan">
                   <DataRow label="Display Name"  value={office.name} />
@@ -307,7 +309,9 @@ export default function OfficeDetailPage() {
                   {office.twilioNumbers?.[0]?.sid && (
                     <DataRow label="Twilio SID" value={office.twilioNumbers[0].sid} mono />
                   )}
-                  <DataRow label="Public Transfer" value={office.publicNumber} mono />
+                  <DataRow label="Practice Phone"  value={office.phone}        mono />
+                  <DataRow label="Office Line 2"   value={office.officeLine2}  mono />
+                  <DataRow label="Office Line 3"   value={office.officeLine3}  mono />
                   <DataRow label="Skip Recording"  value={office.skipRecordingMessage ? 'Yes' : 'No'} />
                 </Panel>
 

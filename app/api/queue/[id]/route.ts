@@ -25,6 +25,8 @@ export async function GET(
         contactRole:       item.contactRole       ?? '',
         email:             item.email             ?? '',
         phone:             item.phone             ?? '',
+        officeLine2:       item.officeLine2       ?? '',
+        officeLine3:       item.officeLine3       ?? '',
         streetAddress:     item.streetAddress     ?? '',
         city:              item.city              ?? '',
         state:             item.state             ?? '',

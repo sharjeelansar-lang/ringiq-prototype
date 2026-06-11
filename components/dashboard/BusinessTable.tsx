@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, Clock, Building2, MoreVertical, Pencil, Trash2, Phone, X, Loader2 } from 'lucide-react';
+import { CheckCircle2, Building2, MoreVertical, Pencil, Trash2, Phone, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { MockBusiness } from '@/types/business';
 
@@ -238,7 +238,7 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
         <div style={{
           display: 'grid', gridTemplateColumns: COLS, gap: 16,
           padding: '10px 20px', borderBottom: `1px solid ${T.border}`,
-          background: T.bg,
+          background: T.bg, minWidth: 640,
         }}>
           {['Practice Name', 'Clean Name', 'Status', 'Timezone', 'Created', ''].map(h => (
             <span key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.light }}>
@@ -267,7 +267,7 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
               onClick={() => router.push(`/dashboard/offices/${biz.mongoOfficeId}`)}
               style={{
                 display: 'grid', gridTemplateColumns: COLS, gap: 16,
-                alignItems: 'center', padding: '13px 20px',
+                alignItems: 'center', padding: '13px 20px', minWidth: 640,
                 cursor: 'pointer', transition: 'background 0.12s',
                 borderBottom: idx !== businesses.length - 1 ? `1px solid ${T.border}` : 'none',
                 borderLeft: '2.5px solid transparent',
@@ -298,27 +298,15 @@ export function BusinessTable({ businesses, onDeleted }: BusinessTableProps) {
 
               {/* Status badge */}
               <div>
-                {biz.environmentStatus === 'live_production' ? (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
-                    background: 'rgba(16,185,129,0.08)', color: '#059669',
-                    border: '1px solid rgba(16,185,129,0.2)',
-                  }}>
-                    <CheckCircle2 size={10} />
-                    Live
-                  </span>
-                ) : (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
-                    background: 'rgba(245,158,11,0.08)', color: '#D97706',
-                    border: '1px solid rgba(245,158,11,0.2)',
-                  }}>
-                    <Clock size={10} />
-                    Testing
-                  </span>
-                )}
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 600,
+                  background: 'rgba(16,185,129,0.08)', color: '#059669',
+                  border: '1px solid rgba(16,185,129,0.2)',
+                }}>
+                  <CheckCircle2 size={10} />
+                  Active
+                </span>
               </div>
 
               {/* Timezone */}

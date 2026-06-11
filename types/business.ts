@@ -28,7 +28,7 @@ export interface BusinessFormData {
 
   // C. Telephony
   inboundPhone: string;
-  publicNumber: string;
+  phone: string;
   twilioSid: string;
   carrierTrunkName: string;
   failoverRingCount: number;

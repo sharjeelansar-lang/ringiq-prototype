@@ -19,6 +19,8 @@ type ProspectData = {
   contactRole:       string;
   email:             string;
   phone:             string;
+  officeLine2:       string;
+  officeLine3:       string;
   streetAddress:     string;
   city:              string;
   state:             string;
@@ -95,8 +97,9 @@ const STEP_SCHEMAS = [
 function StepBar({ currentStep }: { currentStep: number }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', padding: '10px 32px',
+      display: 'flex', alignItems: 'center', padding: '10px 20px',
       borderBottom: '1px solid #E2E8F0', background: '#FFFFFF', flexShrink: 0,
+      overflowX: 'auto',
     }}>
       {STEPS.map((s, i) => {
         const done   = i < currentStep;
@@ -166,8 +169,8 @@ function NewBusinessContent() {
       vapiAssistantTemplateId: '',
       inboundPhone:              '',
       vapiAssistantPhoneNumber:  '',
-      publicNumber:              '',
-      failoverTransferNumber:    '',
+      phone:                     '',
+      officeLine2:               '',
       twilioSid:                 '',
       twilioSubAccountSid:       '',
       twilioSubAccountToken:     '',
@@ -175,7 +178,7 @@ function NewBusinessContent() {
       carrierTrunkName:          '',
       failoverRingCount:    3,
       voipRoutingType:      'sip',
-      timezone:             '',
+      timezone:             (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return ''; } })(),
       streetAddress:        '',
       city:                 '',
       state:                '',
@@ -192,9 +195,7 @@ function NewBusinessContent() {
       onCallDoctorName:      '',
       onCallDoctorPhone:     '',
       phoneProvider:         '',
-      billingDeptPhone:      '',
-      medicalDeptPhone:      '',
-      otherDeptPhone:        '',
+      officeLine3:           '',
       vapiVoiceId:           '',
       discontinueGreetings:  false,
       prospectPlan:          '',
@@ -225,7 +226,15 @@ function NewBusinessContent() {
         }
         if (p.phone) {
           const digits = p.phone.replace(/\D/g, '');
-          if (digits.length === 10) form.setValue('publicNumber', `+1${digits}`);
+          if (digits.length === 10) form.setValue('phone', `+1${digits}`);
+        }
+        if (p.officeLine2) {
+          const digits = p.officeLine2.replace(/\D/g, '');
+          if (digits.length >= 10) form.setValue('officeLine2', `+1${digits.slice(-10)}`);
+        }
+        if (p.officeLine3) {
+          const digits = p.officeLine3.replace(/\D/g, '');
+          if (digits.length >= 10) form.setValue('officeLine3', `+1${digits.slice(-10)}`);
         }
         if (p.streetAddress)   form.setValue('streetAddress',  p.streetAddress);
         if (p.city)            form.setValue('city',           p.city);
@@ -419,10 +428,9 @@ function NewBusinessContent() {
 
             <form id="business-form" onSubmit={form.handleSubmit(handleFinalSubmit)}>
               {step === 0 && (
-                <div style={{
+                <div className="dash-form-grid" style={{
                   background: '#FFFFFF', border: '1px solid #E8EEF4',
                   borderRadius: 10, padding: '18px 20px',
-                  display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0 32px', alignItems: 'start',
                 }}>
 
                   {/* Left — Practice Identity + EHR */}

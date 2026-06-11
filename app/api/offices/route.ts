@@ -40,10 +40,15 @@ export async function GET() {
 
 // Derive UTC offset from a tzName string using Node's Intl API
 function computeTzOffset(tzName: string): number {
-  const now = new Date();
-  const utcMs = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' })).getTime();
-  const tzMs = new Date(now.toLocaleString('en-US', { timeZone: tzName })).getTime();
-  return Math.round((tzMs - utcMs) / 3600000);
+  try {
+    const now = new Date();
+    const utcMs = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' })).getTime();
+    const tzMs  = new Date(now.toLocaleString('en-US', { timeZone: tzName })).getTime();
+    return Math.round((tzMs - utcMs) / 3600000);
+  } catch {
+    console.warn('[offices] invalid timezone value, defaulting offset to 0:', tzName);
+    return 0;
+  }
 }
 
 // Build the workingHours object the DB expects from Mon-Fri/Sat/Sun blocks
@@ -78,8 +83,9 @@ export async function POST(req: NextRequest) {
       vapiAssistantPhoneNumber,
       twilioSid,
       twilioSubAccountSid,
-      publicNumber,
-      failoverTransferNumber,
+      phone,
+      officeLine2,
+      officeLine3,
       vapiAssistantId,
       twilioSubAccountToken,
       emailCompany,
@@ -97,9 +103,6 @@ export async function POST(req: NextRequest) {
       onCallDoctorName,
       onCallDoctorPhone,
       phoneProvider,
-      billingDeptPhone,
-      medicalDeptPhone,
-      otherDeptPhone,
       vapiVoiceId,
       discontinueGreetings,
       prospectPlan,
@@ -121,7 +124,7 @@ export async function POST(req: NextRequest) {
       officeStatus: environmentStatus === 'live_production' ? 'active' : 'testing',
       tzName: timezone,
       tzOffset,
-      publicNumber: publicNumber ?? '',
+      phone: phone ?? '',
       twilioNumbers: [
         ...(inboundPhone ? [{
           number: inboundPhone,
@@ -138,7 +141,7 @@ export async function POST(req: NextRequest) {
           subAccountSid: twilioSubAccountSid ?? '',
         }] : []),
       ],
-      failoverNumber: failoverTransferNumber ?? '',
+      officeLine2: officeLine2 ?? '',
       vapiAssistantId: vapiAssistantId ?? '',
       twilioSubAccountToken: twilioSubAccountToken ?? '',
       skipRecordingMessage: !recordingDisclosure,
@@ -156,11 +159,7 @@ export async function POST(req: NextRequest) {
         phone: onCallDoctorPhone ?? '',
       },
       phoneProvider:        phoneProvider        ?? '',
-      deptRouting: {
-        billing: billingDeptPhone ?? '',
-        medical: medicalDeptPhone ?? '',
-        other:   otherDeptPhone   ?? '',
-      },
+      officeLine3:          officeLine3          ?? '',
       vapiVoiceId:          vapiVoiceId          ?? 'Savannah',
       discontinueGreetings: discontinueGreetings ?? false,
       prospectPlan:         prospectPlan         ?? '',

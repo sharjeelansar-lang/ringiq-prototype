@@ -81,7 +81,7 @@ export default function BusinessesPage() {
         </header>
 
         {/* Stats strip */}
-        <div style={{ display: 'flex', borderBottom: `1px solid ${T.border}`, flexShrink: 0, background: T.surface }}>
+        <div className="dash-stats-strip" style={{ borderBottom: `1px solid ${T.border}`, flexShrink: 0, background: T.surface }}>
           {stats.map(({ label, value, icon: Icon, color }, i) => (
             <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, padding: '14px 24px', borderRight: i < stats.length - 1 ? `1px solid ${T.border}` : 'none' }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, background: T.bg, border: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -118,7 +118,7 @@ export default function BusinessesPage() {
             )}
 
             {loading ? (
-              <div style={{ borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
+              <div className="dash-overflow"><div style={{ borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, overflow: 'hidden' }}>
                 {[...Array(4)].map((_, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 24, padding: '14px 20px', borderBottom: i < 3 ? `1px solid ${T.border}` : 'none', opacity: 1 - i * 0.18 }}>
                     {[200, 140, 64, 140, 80].map((w, j) => (
@@ -126,9 +126,9 @@ export default function BusinessesPage() {
                     ))}
                   </div>
                 ))}
-              </div>
+              </div></div>
             ) : (
-              <BusinessTable businesses={businesses} onDeleted={fetchOffices} />
+              <div className="dash-overflow"><BusinessTable businesses={businesses} onDeleted={fetchOffices} /></div>
             )}
           </div>
         </main>

@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTwilioMainClient, getTwilioSubClient } from '@/lib/twilio';
 
+const VAPI_VOICE_URL  = 'https://api.vapi.ai/twilio/inbound_call';
+const VAPI_STATUS_URL = 'https://api.vapi.ai/twilio/status';
+
 export async function POST(req: NextRequest) {
   try {
-    const { phoneNumber, friendlyName, subAccountSid, subAccountToken } = await req.json();
+    const {
+      phoneNumber, friendlyName, subAccountSid, subAccountToken,
+      failoverNumber, numberType,
+    } = await req.json();
+
+    const type: 'twilio' | 'vapi' = numberType === 'vapi' ? 'vapi' : 'twilio';
 
     if (!phoneNumber) {
       return NextResponse.json(
@@ -27,8 +35,7 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
-    // If a sub-account was created earlier, buy within that context;
-    // otherwise fall back to the main account
+    // Both numbers are purchased under the sub-account when one exists
     const client = subAccountSid && subAccountToken
       ? getTwilioSubClient(subAccountSid, subAccountToken)
       : getTwilioMainClient();
@@ -36,6 +43,28 @@ export async function POST(req: NextRequest) {
     const purchased = await client.incomingPhoneNumbers.create({
       phoneNumber,
       friendlyName: friendlyName ?? phoneNumber,
+    });
+
+    // Normalise failover to E.164 for twimlets fallback
+    const failoverE164 = failoverNumber
+      ? (String(failoverNumber).startsWith('+') ? failoverNumber : `+1${String(failoverNumber).replace(/\D/g, '')}`)
+      : null;
+
+    const fallbackUrl = failoverE164 ? `http://twimlets.com/forward?PhoneNumber=${failoverE164}` : '';
+
+    // Configure webhooks immediately after purchase based on number type
+    const ringiqServerUrl = process.env.RINGIQ_SERVER_URL ?? '';
+    const voiceUrl = type === 'vapi' ? VAPI_VOICE_URL : `${ringiqServerUrl}/twilio/voice`;
+
+    await client.incomingPhoneNumbers(purchased.sid).update({
+      voiceUrl,
+      voiceMethod:         'POST',
+      voiceFallbackUrl:    fallbackUrl,
+      voiceFallbackMethod: 'POST',
+      ...(type === 'vapi' ? {
+        statusCallback:       VAPI_STATUS_URL,
+        statusCallbackMethod: 'POST',
+      } : {}),
     });
 
     return NextResponse.json({
@@ -48,7 +77,7 @@ export async function POST(req: NextRequest) {
         capabilities: purchased.capabilities,
         dateCreated: purchased.dateCreated,
       },
-      // Echo back sub-account credentials so the frontend can persist them reliably
+      numberType: type,
       subAccountSid:   subAccountSid   ?? null,
       subAccountToken: subAccountToken ?? null,
     }, { status: 201 });

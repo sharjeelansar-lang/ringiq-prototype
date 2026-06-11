@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   Bot, Link2, CheckCircle2, Loader2,
-  Phone, Sparkles, AlertCircle, Mic, Volume2,
+  Phone, Sparkles, AlertCircle, Mic, Play, Square,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { BusinessFormSchema } from '@/lib/schema';
+import { VOICES } from '@/lib/onboard';
 
 interface Props { form: UseFormReturn<BusinessFormSchema>; }
 
@@ -45,20 +46,34 @@ function StepBadge({ n, done, active }: { n: number; done: boolean; active: bool
   );
 }
 
-const VOICES = [
-  { id: 'aria',   label: 'Aria',   desc: 'Warm · Friendly · Professional' },
-  { id: 'maya',   label: 'Maya',   desc: 'Clear · Articulate · Confident'  },
-  { id: 'claire', label: 'Claire', desc: 'Calm · Empathetic · Reassuring'  },
-  { id: 'jordan', label: 'Jordan', desc: 'Bright · Energetic · Approachable' },
-] as const;
-
 export function VapiSetupSection({ form }: Props) {
   const { watch, setValue } = form;
+
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+  const [loadingVoice, setLoadingVoice] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  const handlePlay = (voiceId: string, src: string) => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    if (playingVoice === voiceId) { setPlayingVoice(null); return; }
+    setLoadingVoice(voiceId);
+    const audio = new Audio(src);
+    audioRef.current = audio;
+    audio.addEventListener('canplay', () => {
+      setLoadingVoice(null); setPlayingVoice(voiceId);
+      audio.play().catch(() => setPlayingVoice(null));
+    });
+    audio.addEventListener('ended', () => setPlayingVoice(null));
+    audio.addEventListener('error', () => { setLoadingVoice(null); setPlayingVoice(null); });
+    audio.load();
+  };
 
   const practiceDisplayName  = watch('practiceDisplayName');
   const cpmid                = watch('cpmid');
   const mongoOfficeId        = watch('mongoOfficeId');
-  const publicNumber         = watch('publicNumber');
+  const phone                = watch('phone');
   const syeLocationId        = watch('syeLocationId');
   const recordingDisclosure  = watch('recordingDisclosure');
   const allowSameDayBookings = watch('allowSameDayBookings');
@@ -118,7 +133,7 @@ export function VapiSetupSection({ form }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          practiceDisplayName, cpmid, mongoOfficeId, publicNumber,
+          practiceDisplayName, cpmid, mongoOfficeId, phone,
           syeLocationId, recordingDisclosure, allowSameDayBookings,
           voiceId: vapiVoiceId || 'aria',
         }),
@@ -264,34 +279,67 @@ export function VapiSetupSection({ form }: Props) {
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            {VOICES.map((v) => {
-              const selected = vapiVoiceId === v.id;
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {VOICES.map(({ id, name, tone, desc, sample }) => {
+              const selected  = vapiVoiceId === id;
+              const isPlaying = playingVoice === id;
+              const isLoading = loadingVoice === id;
               return (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => setValue('vapiVoiceId', v.id, { shouldValidate: false })}
+                <div
+                  key={id}
+                  role="radio"
+                  aria-checked={selected}
+                  tabIndex={0}
+                  onClick={() => setValue('vapiVoiceId', id, { shouldValidate: false })}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setValue('vapiVoiceId', id, { shouldValidate: false }); } }}
                   style={{
-                    display: 'flex', flexDirection: 'column', gap: 3,
-                    padding: '9px 10px', borderRadius: 8, textAlign: 'left',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
                     border: `1.5px solid ${selected ? T.violet : T.border}`,
                     background: selected ? T.violetFd : T.hover,
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+                    transition: 'all 0.15s', userSelect: 'none',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <Volume2 size={10} style={{ color: selected ? T.violet : T.light }} />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: selected ? T.violet : T.navy }}>{v.label}</span>
+                  <div style={{
+                    width: 14, height: 14, borderRadius: '50%', flexShrink: 0,
+                    border: `2px solid ${selected ? T.violet : T.light}`,
+                    background: selected ? T.violet : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {selected && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }} />}
                   </div>
-                  <span style={{ fontSize: 10, color: T.light, lineHeight: 1.4 }}>{v.desc}</span>
-                </button>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, color: selected ? T.violet : T.light, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{tone}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: selected ? T.violet : T.navy }}>{name}</div>
+                    <div style={{ fontSize: 11, color: T.muted, lineHeight: 1.3 }}>{desc}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handlePlay(id, sample); }}
+                    aria-label={isPlaying ? 'Stop sample' : 'Play voice sample'}
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      border: `1.5px solid ${isPlaying ? T.violet : T.border}`,
+                      background: isPlaying ? T.violet : T.surface,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    {isLoading ? (
+                      <Loader2 size={11} style={{ color: T.violet, animation: 'spin 1s linear infinite' }} />
+                    ) : isPlaying ? (
+                      <Square size={8} color="#fff" fill="#fff" />
+                    ) : (
+                      <Play size={10} color={selected ? T.violet : T.light} fill={selected ? T.violet : T.light} style={{ marginLeft: 1 }} />
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>
 
           {!vapiVoiceId && (
-            <p style={{ fontSize: 11, color: T.light }}>No voice selected — defaults to Aria on deploy.</p>
+            <p style={{ fontSize: 11, color: T.light }}>No voice selected — defaults to Savannah on deploy.</p>
           )}
 
           {/* Discontinue greetings */}
