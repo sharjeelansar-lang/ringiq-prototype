@@ -19,12 +19,20 @@ export function CoreBusinessSection({ form }: Props) {
   }, [displayName, setValue]);
 
   return (
-    <FormField label="Practice Display Name" required error={errors.practiceDisplayName?.message}>
-      <Input
-        {...register('practiceDisplayName')}
-        placeholder="Primary Eyecare Associates - Sterling Heights"
-        error={!!errors.practiceDisplayName}
-      />
-    </FormField>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <FormField label="Practice Display Name" required error={errors.practiceDisplayName?.message}>
+        <Input
+          {...register('practiceDisplayName')}
+          placeholder="Primary Eyecare Associates - Sterling Heights"
+          error={!!errors.practiceDisplayName}
+        />
+      </FormField>
+      <FormField label="Practice Website">
+        <Input
+          {...register('website')}
+          placeholder="https://www.practice.com"
+        />
+      </FormField>
+    </div>
   );
 }

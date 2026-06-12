@@ -1,7 +1,7 @@
 'use client';
 
 import { type S1 } from '@/types/onboard';
-import { ObField, ObInput } from '@/components/onboard/ObField/ObField';
+import { ObField, ObInput, ObSelect } from '@/components/onboard/ObField/ObField';
 
 export function Step1Form({
   data, onChange, errors, plan,
@@ -11,11 +11,19 @@ export function Step1Form({
   const u = (k: keyof S1) => (v: string) => onChange({ ...data, [k]: v });
   const line2Required = plan === 'backup';
   return (
-    <div className="ob-fields">
+    <div className="flex flex-col gap-3.5">
       <ObField label="Practice Name" error={errors.practiceName}>
         <ObInput value={data.practiceName} onChange={u('practiceName')} placeholder="Valley Eye Associates" hasError={!!errors.practiceName} />
       </ObField>
-      <div className="ob-row-2">
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+        <ObField label="Website" error={errors.website}>
+          <ObInput value={data.website} onChange={u('website')} placeholder="https://www.valleyeye.com" hasError={!!errors.website} />
+        </ObField>
+        <ObField label="EHR / Patient Management Software" error={errors.ehrSystem}>
+          <ObSelect value={data.ehrSystem} onChange={u('ehrSystem')} options={['CrystalPM']} hasError={!!errors.ehrSystem} />
+        </ObField>
+      </div>
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <ObField label="Your Name" error={errors.contactName}>
           <ObInput value={data.contactName} onChange={u('contactName')} placeholder="Dr. Sarah Chen" hasError={!!errors.contactName} />
         </ObField>
@@ -28,24 +36,19 @@ export function Step1Form({
       </ObField>
 
       <div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--mid)', marginBottom: 4 }}>
+        <p className="mb-1 text-[13px] font-bold text-mid">
           Additional Phone Lines{' '}
           {line2Required
-            ? <span style={{ fontWeight: 600, color: 'var(--teal)', fontSize: 12 }}>Line 2 required for 3-Ring Backup</span>
-            : <span style={{ fontWeight: 400, color: 'var(--light)' }}>(optional)</span>
+            ? <span className="text-xs font-semibold text-teal">Line 2 required for 3-Ring Backup</span>
+            : <span className="font-normal text-light">(optional)</span>
           }
         </p>
-        <p style={{ fontSize: 12, color: 'var(--muted-foreground)', marginBottom: 10, lineHeight: 1.5 }}>
-          These lines help Iris route calls correctly. Lines can be direct-dial or Main + extension.
+        <p className="mb-2.5 text-xs leading-normal text-muted-foreground">
+          Use the line your office answers after three rings. It can be direct-dial or Main + extension.
         </p>
-        <div className="ob-row-2">
-          <ObField label={`Office Line 2 — Staff / 3rd-ring pickup${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
-            <ObInput value={data.officeLine2} onChange={u('officeLine2')} placeholder="(208) 555-0102 or ext. 2" type="tel" hasError={!!errors.officeLine2} />
-          </ObField>
-          <ObField label="Office Line 3 — AI transfer line">
-            <ObInput value={data.officeLine3} onChange={u('officeLine3')} placeholder="(208) 555-0103 or ext. 3" type="tel" />
-          </ObField>
-        </div>
+        <ObField label={`3-Ring Backup / 2nd PEC line${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
+          <ObInput value={data.officeLine2} onChange={u('officeLine2')} placeholder="(586) 991-6560 or ext. 2" type="tel" hasError={!!errors.officeLine2} />
+        </ObField>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ export const businessFormSchema = z.object({
   // A. Core Business Parameters
   practiceDisplayName: z.string().min(2, 'Practice name must be at least 2 characters'),
   corporateCleanName: z.string().min(2, 'Clean name must be at least 2 characters'),
+  website: z.string().optional().or(z.literal('')),
   environmentStatus: z.enum(['internal_testing', 'live_production']),
   mongoOfficeId: z.string().readonly(),
 
@@ -53,6 +54,11 @@ export const businessFormSchema = z.object({
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
   operationalHours: z.object({
     mondayFriday: businessHoursSchema,
+    monday: businessHoursSchema,
+    tuesday: businessHoursSchema,
+    wednesday: businessHoursSchema,
+    thursday: businessHoursSchema,
+    friday: businessHoursSchema,
     saturday: businessHoursSchema,
     sunday: businessHoursSchema,
   }),
@@ -60,6 +66,8 @@ export const businessFormSchema = z.object({
   officeGreeting: z.string().optional(),
   locationNote: z.string().optional(),
   afterHoursPolicy: z.string().optional(),
+  currentAfterHoursPolicy: z.string().optional(),
+  ringiqAfterHoursPolicy: z.string().optional(),
   onCallDoctorName: z.string().optional(),
   onCallDoctorPhone: z.string().optional().or(z.literal('')),
 

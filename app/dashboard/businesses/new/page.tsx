@@ -19,8 +19,8 @@ type ProspectData = {
   contactRole:       string;
   email:             string;
   phone:             string;
+  website:           string;
   officeLine2:       string;
-  officeLine3:       string;
   streetAddress:     string;
   city:              string;
   state:             string;
@@ -35,6 +35,8 @@ type ProspectData = {
   officeHours:       Record<string, unknown>;
   lunchBreak:        string;
   afterHoursPolicy:  string;
+  currentAfterHoursPolicy: string;
+  ringiqAfterHoursPolicy:  string;
   voice:             string;
   plan:              string;
 };
@@ -42,7 +44,6 @@ type ProspectData = {
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { businessFormSchema, BusinessFormSchema } from '@/lib/schema';
 import { generateMongoId } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 import { CoreBusinessSection }  from '@/components/form/sections/CoreBusinessSection';
 import { EHRMappingSection }    from '@/components/form/sections/EHRMappingSection';
 import { ProvisioningSection }  from '@/components/form/sections/ProvisioningSection';
@@ -149,18 +150,19 @@ function NewBusinessContent() {
   const searchParams = useSearchParams();
   const prospectId   = searchParams.get('prospectId') ?? '';
 
-  const [mongoId,     setMongoId]     = useState('');
+  const [mongoId]                    = useState(() => generateMongoId());
   const [step,        setStep]        = useState(0);
   const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [createdId,   setCreatedId]   = useState('');
   const [prospect,    setProspect]    = useState<ProspectData | null>(null);
-  const [prospectLoading, setProspectLoading] = useState(false);
+  const [prospectLoading, setProspectLoading] = useState(() => !!prospectId);
 
   const form = useForm<BusinessFormSchema>({
     resolver: zodResolver(businessFormSchema),
     defaultValues: {
       practiceDisplayName:  '',
       corporateCleanName:   '',
+      website:              '',
       environmentStatus:    'internal_testing',
       mongoOfficeId:        '',
       emailCompany:         '',
@@ -185,6 +187,11 @@ function NewBusinessContent() {
       zipCode:              '',
       operationalHours: {
         mondayFriday: { open: '08:00', close: '17:00', closed: false },
+        monday:       { open: '08:00', close: '17:00', closed: false },
+        tuesday:      { open: '08:00', close: '17:00', closed: false },
+        wednesday:    { open: '08:00', close: '17:00', closed: false },
+        thursday:     { open: '08:00', close: '17:00', closed: false },
+        friday:       { open: '08:00', close: '17:00', closed: false },
         saturday:     { open: '09:00', close: '14:00', closed: false },
         sunday:       { open: '',      close: '',      closed: true  },
       },
@@ -192,10 +199,11 @@ function NewBusinessContent() {
       officeGreeting:        '',
       locationNote:          '',
       afterHoursPolicy:      '',
+      currentAfterHoursPolicy: '',
+      ringiqAfterHoursPolicy:  '',
       onCallDoctorName:      '',
       onCallDoctorPhone:     '',
       phoneProvider:         '',
-      officeLine3:           '',
       vapiVoiceId:           '',
       discontinueGreetings:  false,
       prospectPlan:          '',
@@ -208,12 +216,9 @@ function NewBusinessContent() {
   });
 
   useEffect(() => {
-    const id = generateMongoId();
-    setMongoId(id);
-    form.setValue('mongoOfficeId', id);
+    form.setValue('mongoOfficeId', mongoId);
 
     if (!prospectId) return;
-    setProspectLoading(true);
     fetch(`/api/queue/${prospectId}`)
       .then((r) => r.json())
       .then((j) => {
@@ -224,6 +229,7 @@ function NewBusinessContent() {
           form.setValue('practiceDisplayName', p.practiceName);
           form.setValue('corporateCleanName',  p.practiceName);
         }
+        if (p.website) form.setValue('website', p.website);
         if (p.phone) {
           const digits = p.phone.replace(/\D/g, '');
           if (digits.length === 10) form.setValue('phone', `+1${digits}`);
@@ -231,10 +237,6 @@ function NewBusinessContent() {
         if (p.officeLine2) {
           const digits = p.officeLine2.replace(/\D/g, '');
           if (digits.length >= 10) form.setValue('officeLine2', `+1${digits.slice(-10)}`);
-        }
-        if (p.officeLine3) {
-          const digits = p.officeLine3.replace(/\D/g, '');
-          if (digits.length >= 10) form.setValue('officeLine3', `+1${digits.slice(-10)}`);
         }
         if (p.streetAddress)   form.setValue('streetAddress',  p.streetAddress);
         if (p.city)            form.setValue('city',           p.city);
@@ -245,6 +247,8 @@ function NewBusinessContent() {
         if (p.officeGreeting)  form.setValue('officeGreeting', p.officeGreeting);
         if (p.locationNote)    form.setValue('locationNote',   p.locationNote);
         if (p.afterHoursPolicy) form.setValue('afterHoursPolicy', p.afterHoursPolicy);
+        if (p.currentAfterHoursPolicy) form.setValue('currentAfterHoursPolicy', p.currentAfterHoursPolicy);
+        if (p.ringiqAfterHoursPolicy)  form.setValue('ringiqAfterHoursPolicy',  p.ringiqAfterHoursPolicy);
         if (p.phoneProvider)   form.setValue('phoneProvider',  p.phoneProvider);
         if (p.voice)           form.setValue('vapiVoiceId',    p.voice);
         if (p.plan)            form.setValue('prospectPlan',   p.plan);
@@ -252,9 +256,16 @@ function NewBusinessContent() {
           const h = p.officeHours as Record<string, { open?: string; close?: string; closed?: boolean }>;
           if (h.mondayFriday?.open)  form.setValue('operationalHours.mondayFriday.open',  h.mondayFriday.open);
           if (h.mondayFriday?.close) form.setValue('operationalHours.mondayFriday.close', h.mondayFriday.close);
+          (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const).forEach((day) => {
+            if (h[day]?.open)  form.setValue(`operationalHours.${day}.open`,  h[day].open);
+            if (h[day]?.close) form.setValue(`operationalHours.${day}.close`, h[day].close);
+            if (h[day]?.closed !== undefined) form.setValue(`operationalHours.${day}.closed`, !!h[day].closed);
+          });
           if (h.saturday?.open)      form.setValue('operationalHours.saturday.open',       h.saturday.open);
           if (h.saturday?.close)     form.setValue('operationalHours.saturday.close',      h.saturday.close);
           if (h.saturday?.closed !== undefined) form.setValue('operationalHours.saturday.closed', !!h.saturday.closed);
+          if (h.sunday?.open)        form.setValue('operationalHours.sunday.open',          h.sunday.open);
+          if (h.sunday?.close)       form.setValue('operationalHours.sunday.close',         h.sunday.close);
           if (h.sunday?.closed !== undefined)   form.setValue('operationalHours.sunday.closed',   !!h.sunday.closed);
         }
       })
@@ -396,6 +407,7 @@ function NewBusinessContent() {
             <span style={{ fontSize: 12, color: '#64748B' }}>
               · {prospect.contactName}{prospect.contactRole ? `, ${prospect.contactRole}` : ''}
               {prospect.email ? ` · ${prospect.email}` : ''}
+              {prospect.website ? ` · ${prospect.website}` : ''}
             </span>
             <a
               href={`/dashboard/queue`}

@@ -11,8 +11,8 @@ export function Step2Form({
 }) {
   const u = (k: keyof S2) => (v: string) => onChange({ ...data, [k]: v });
   return (
-    <div className="ob-fields">
-      <div className="ob-row-2">
+    <div className="flex flex-col gap-3.5">
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <ObField label="Office Time Zone" error={errors.timezone}>
           <ObSelect value={data.timezone} onChange={u('timezone')} options={US_TIMEZONES} placeholder="Select time zone" hasError={!!errors.timezone} />
         </ObField>
@@ -23,7 +23,7 @@ export function Step2Form({
       <ObField label="Street Address" error={errors.streetAddress}>
         <ObInput value={data.streetAddress} onChange={u('streetAddress')} placeholder="123 Main St, Suite 200" hasError={!!errors.streetAddress} />
       </ObField>
-      <div className="ob-row-3">
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-[2fr_1fr_1fr]">
         <ObField label="City" error={errors.city}>
           <ObInput value={data.city} onChange={u('city')} placeholder="Boise" hasError={!!errors.city} />
         </ObField>
@@ -34,7 +34,7 @@ export function Step2Form({
           <ObInput value={data.zipCode} onChange={u('zipCode')} placeholder="83702" hasError={!!errors.zipCode} />
         </ObField>
       </div>
-      <div className="ob-row-2">
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <ObField label="Phone Provider" error={errors.phoneProvider}>
           <ObSelect value={data.phoneProvider} onChange={u('phoneProvider')} options={PHONE_PROVIDERS} placeholder="Who is your provider?" hasError={!!errors.phoneProvider} />
         </ObField>
