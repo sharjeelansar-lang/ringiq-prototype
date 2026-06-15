@@ -8,10 +8,6 @@ export function DemoSection() {
       <div className="lp-container">
 
         <Reveal className="text-center mb-10" y={14}>
-          <div className="inline-flex items-center gap-2 px-[14px] py-[5px] bg-accent-border rounded-full mb-5 border border-[#5B7BD840]">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary block shrink-0" />
-            <span className="text-[13px] font-semibold text-primary tracking-[0.01em]">Live demo</span>
-          </div>
           <h2 className="font-display text-[clamp(32px,4vw,52px)] font-extrabold tracking-[-0.035em] text-foreground m-0 mb-4 leading-[1.08]">
             Hear Iris in Action
           </h2>
@@ -24,13 +20,13 @@ export function DemoSection() {
         <Reveal className="relative max-w-[760px] mx-auto" delay={0.08} y={18}>
 
           <div className="lp-demo-badge lp-demo-badge-left">
-            <p className="text-[12px] font-semibold text-foreground leading-[1.45] m-0">
+            <p className="lp-demo-badge__text">
               Iris is available 24/7 for you to test now
             </p>
           </div>
 
           <div className="lp-demo-badge lp-demo-badge-right">
-            <p className="text-[12px] font-semibold text-foreground leading-[1.45] m-0">
+            <p className="lp-demo-badge__text">
               Listen to Iris work with a patient call
             </p>
           </div>

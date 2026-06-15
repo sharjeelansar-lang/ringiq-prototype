@@ -8,9 +8,9 @@ import { ObField } from '@/components/onboard/ObField/ObField';
 import { cn } from '@/lib/utils';
 
 export function Step4Form({
-  data, toggle, onChange,
+  data, toggle, onChange, showNotes = true,
 }: {
-  data: S4; toggle: (id: string) => void; onChange: (d: S4) => void;
+  data: S4; toggle: (id: string) => void; onChange: (d: S4) => void; showNotes?: boolean;
 }) {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [loadingVoice, setLoadingVoice] = useState<string | null>(null);
@@ -123,16 +123,18 @@ export function Step4Form({
         </div>
       </div>
 
-      <ObField label="Anything else? (optional)">
-        <div className="flex min-h-[92px] items-start gap-2.5 rounded-xl border-[1.5px] border-border bg-input-bg px-3.5 transition-[border-color,box-shadow,background-color] duration-150 focus-within:border-primary focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(39,73,147,0.1)]">
-          <textarea
-            value={data.notes}
-            onChange={(e) => onChange({ ...data, notes: e.target.value })}
-            placeholder="Special requirements, questions, or context you'd like us to know…"
-            className="min-h-[66px] min-w-0 flex-1 resize-y border-0 bg-transparent py-3.5 font-[inherit] text-[15px] leading-relaxed text-foreground outline-none placeholder:text-light"
-          />
-        </div>
-      </ObField>
+      {showNotes && (
+        <ObField label="Anything else? (optional)">
+          <div className="flex min-h-[92px] items-start gap-2.5 rounded-xl border-[1.5px] border-border bg-input-bg px-3.5 transition-[border-color,box-shadow,background-color] duration-150 focus-within:border-primary focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(39,73,147,0.1)]">
+            <textarea
+              value={data.notes}
+              onChange={(e) => onChange({ ...data, notes: e.target.value })}
+              placeholder="Special requirements, questions, or context you'd like us to know…"
+              className="min-h-[66px] min-w-0 flex-1 resize-y border-0 bg-transparent py-3.5 font-[inherit] text-[15px] leading-relaxed text-foreground outline-none placeholder:text-light"
+            />
+          </div>
+        </ObField>
+      )}
     </div>
   );
 }

@@ -42,11 +42,29 @@ export function HeroSection() {
           </p>
         </div>
 
+        <HeroPromoBurst />
+
         <div className="lp-hero-visual animate-lp-fade-up-delayed">
           <IrisVisual />
         </div>
       </div>
     </section>
+  )
+}
+
+function HeroPromoBurst() {
+  return (
+    <Link
+      href="#pricing"
+      className="lp-hero-promo"
+      aria-label="View pricing for the Free Nights and Weekends plan"
+    >
+      <span className="lp-hero-promo__burst" aria-hidden="true" />
+      <span className="lp-hero-promo__shine" aria-hidden="true" />
+      <span className="lp-hero-promo__content">
+        Free Nights &amp; Weekends
+      </span>
+    </Link>
   )
 }
 

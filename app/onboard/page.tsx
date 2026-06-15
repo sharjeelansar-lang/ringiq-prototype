@@ -4,7 +4,6 @@ import { Suspense, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, ArrowLeft, Check, Loader2, X } from 'lucide-react';
-
 import { type S1, type S2, type S3, type S4 } from '@/types/onboard';
 import { PLANS, type PlanSlug, planLabel, vapiVoiceId, META_WITH_PLAN, META_NO_PLAN } from '@/lib/onboard';
 import { LeftPanel }     from '@/components/onboard/LeftPanel/LeftPanel';
@@ -83,11 +82,11 @@ function OnboardContent() {
   });
   const [s4, setS4] = useState<S4>({ voice: '', interests: [], notes: '' });
 
-  const practiceStep = hasPlanFromUrl ? 1 : 2;
-  const setupStep    = hasPlanFromUrl ? 2 : 3;
-  const officeStep   = hasPlanFromUrl ? 3 : 4;
-  const goalsStep    = hasPlanFromUrl ? 4 : 5;
-  const planStep     = hasPlanFromUrl ? null : 1;
+  const goalsStep    = 1;
+  const planStep     = hasPlanFromUrl ? null : 2;
+  const practiceStep = hasPlanFromUrl ? 2 : 3;
+  const setupStep    = hasPlanFromUrl ? 3 : 4;
+  const officeStep   = hasPlanFromUrl ? 4 : 5;
 
   const meta = hasPlanFromUrl ? META_NO_PLAN : META_WITH_PLAN;
 
@@ -141,6 +140,7 @@ function OnboardContent() {
   const handleBack = () => { setErrors({}); setStep((n) => n - 1); };
 
   const handleSubmit = async () => {
+    if (step === officeStep && !validateOffice()) return;
     setSubmitting(true);
     setSubmitError('');
     try {
@@ -258,7 +258,7 @@ function OnboardContent() {
             {step === practiceStep && <Step1Form data={s1} onChange={setS1} errors={errors} plan={plan} />}
             {step === setupStep    && <Step2Form data={s2} onChange={setS2} errors={errors} />}
             {step === officeStep   && <Step3Form data={s3} onChange={setS3} errors={errors} />}
-            {step === goalsStep    && <Step4Form data={s4} toggle={toggleInterest} onChange={setS4} />}
+            {step === goalsStep    && <Step4Form data={s4} toggle={toggleInterest} onChange={setS4} showNotes={false} />}
           </div>
 
           {submitError && (

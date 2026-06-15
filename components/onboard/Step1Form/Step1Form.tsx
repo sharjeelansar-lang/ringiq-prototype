@@ -3,12 +3,25 @@
 import { type S1 } from '@/types/onboard';
 import { ObField, ObInput, ObSelect } from '@/components/onboard/ObField/ObField';
 
+function phoneDigits(value: string) {
+  return value.replace(/\D/g, '').slice(0, 10);
+}
+
+function formatPhoneDisplay(value: string) {
+  const digits = phoneDigits(value);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 export function Step1Form({
   data, onChange, errors, plan,
 }: {
   data: S1; onChange: (d: S1) => void; errors: Record<string, string>; plan?: string;
 }) {
   const u = (k: keyof S1) => (v: string) => onChange({ ...data, [k]: v });
+  const phoneU = (k: 'phone' | 'officeLine2') => (v: string) => onChange({ ...data, [k]: phoneDigits(v) });
   const line2Required = plan === 'backup';
   return (
     <div className="flex flex-col gap-3.5">
@@ -32,7 +45,7 @@ export function Step1Form({
         </ObField>
       </div>
       <ObField label="Practice Phone" error={errors.phone}>
-        <ObInput value={data.phone} onChange={u('phone')} placeholder="(208) 552-7323" type="tel" hasError={!!errors.phone} />
+        <ObInput value={formatPhoneDisplay(data.phone)} onChange={phoneU('phone')} placeholder="(208) 552-7323" type="tel" hasError={!!errors.phone} />
       </ObField>
 
       <div>
@@ -47,7 +60,7 @@ export function Step1Form({
           Use the line your office answers after three rings. It can be direct-dial or Main + extension.
         </p>
         <ObField label={`3-Ring Backup / 2nd PEC line${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
-          <ObInput value={data.officeLine2} onChange={u('officeLine2')} placeholder="(586) 991-6560 or ext. 2" type="tel" hasError={!!errors.officeLine2} />
+          <ObInput value={formatPhoneDisplay(data.officeLine2)} onChange={phoneU('officeLine2')} placeholder="(586) 991-6560" type="tel" hasError={!!errors.officeLine2} />
         </ObField>
       </div>
     </div>
