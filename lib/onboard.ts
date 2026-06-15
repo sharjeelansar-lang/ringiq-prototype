@@ -73,7 +73,7 @@ export const CALL_VOLUMES = [
 ];
 
 export const PHONE_SETUPS = [
-  'Basic landline', 'VoIP / digital phone', 'Answering service', 'Dedicated receptionist',
+  'Basic landline', 'VoIP / digital phone', 'Answering service', 'Other',
 ];
 
 export const PHONE_PROVIDERS_LIST = PHONE_PROVIDERS;
@@ -104,16 +104,16 @@ export const BENEFITS = [
 
 // ── Step metadata ─────────────────────────────────────────────────────────────
 export const META_WITH_PLAN = [
-  { title: 'Choose your plan',        sub: 'Select the coverage that fits your practice' },
+  { title: 'Meet Iris first',          sub: "Preview Iris's voice and tell us what matters most before choosing coverage." },
+  { title: 'Choose the plan you might want to start with', sub: "We'll build a test agent you can talk with and customize. When you're comfortable, you can start with your chosen plan." },
   { title: 'About your practice',     sub: 'Tell us who you are and how to reach you' },
   { title: 'Your current setup',      sub: 'Help us understand your practice and phone system' },
   { title: 'Office hours & greeting', sub: 'Configure how Iris will represent your practice' },
-  { title: 'What matters most',       sub: "Pick Iris's voice and select your priorities" },
 ];
 
 export const META_NO_PLAN = [
+  { title: 'Meet Iris first',          sub: "Preview Iris's voice and tell us what matters most before setup." },
   { title: 'About your practice',     sub: 'Tell us who you are and how to reach you' },
   { title: 'Your current setup',      sub: 'Help us understand your practice and phone system' },
   { title: 'Office hours & greeting', sub: 'Configure how Iris will represent your practice' },
-  { title: 'What matters most',       sub: "Pick Iris's voice and select your priorities" },
 ];

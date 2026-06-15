@@ -51,20 +51,29 @@ function computeTzOffset(tzName: string): number {
   }
 }
 
-// Build the workingHours object the DB expects from Mon-Fri/Sat/Sun blocks
+// Build the workingHours object the DB expects from day-by-day schedule blocks.
 function buildWorkingHours(operationalHours: {
   mondayFriday: { open: string; close: string; closed: boolean };
+  monday?: { open: string; close: string; closed: boolean };
+  tuesday?: { open: string; close: string; closed: boolean };
+  wednesday?: { open: string; close: string; closed: boolean };
+  thursday?: { open: string; close: string; closed: boolean };
+  friday?: { open: string; close: string; closed: boolean };
   saturday: { open: string; close: string; closed: boolean };
   sunday: { open: string; close: string; closed: boolean };
 }) {
   const { mondayFriday, saturday, sunday } = operationalHours;
-  const weekday = { isOpen: !mondayFriday.closed, open: mondayFriday.open, close: mondayFriday.close };
+  const day = (value: { open: string; close: string; closed: boolean } | undefined) => {
+    const source = value ?? mondayFriday;
+    return { isOpen: !source.closed, open: source.open, close: source.close };
+  };
+
   return {
-    mon: weekday,
-    tue: weekday,
-    wed: weekday,
-    thu: weekday,
-    fri: weekday,
+    mon: day(operationalHours.monday),
+    tue: day(operationalHours.tuesday),
+    wed: day(operationalHours.wednesday),
+    thu: day(operationalHours.thursday),
+    fri: day(operationalHours.friday),
     sat: { isOpen: !saturday.closed, open: saturday.open, close: saturday.close },
     sun: { isOpen: !sunday.closed, open: sunday.open, close: sunday.close },
   };
@@ -76,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     const {
       practiceDisplayName,
+      website,
       environmentStatus,
       cpmid,
       syeLocationId,
@@ -100,6 +110,8 @@ export async function POST(req: NextRequest) {
       officeGreeting,
       locationNote,
       afterHoursPolicy,
+      currentAfterHoursPolicy,
+      ringiqAfterHoursPolicy,
       onCallDoctorName,
       onCallDoctorPhone,
       phoneProvider,
@@ -125,6 +137,7 @@ export async function POST(req: NextRequest) {
       tzName: timezone,
       tzOffset,
       phone: phone ?? '',
+      website: website ?? '',
       twilioNumbers: [
         ...(inboundPhone ? [{
           number: inboundPhone,
@@ -154,6 +167,8 @@ export async function POST(req: NextRequest) {
       officeGreeting:       officeGreeting       ?? '',
       locationNote:         locationNote         ?? '',
       afterHoursPolicy:     afterHoursPolicy     ?? '',
+      currentAfterHoursPolicy: currentAfterHoursPolicy ?? '',
+      ringiqAfterHoursPolicy:  ringiqAfterHoursPolicy  ?? '',
       onCallDoctor: {
         name:  onCallDoctorName  ?? '',
         phone: onCallDoctorPhone ?? '',

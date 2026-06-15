@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const required = ['practiceName', 'contactName', 'contactRole', 'email', 'phone', 'streetAddress', 'city', 'state', 'zipCode', 'timezone'];
+    const required = ['practiceName', 'contactName', 'contactRole', 'email', 'phone', 'website', 'ehrSystem', 'streetAddress', 'city', 'state', 'zipCode', 'timezone', 'currentAfterHoursPolicy', 'ringiqAfterHoursPolicy'];
     const missing = required.filter((k) => !body[k]);
     if (missing.length > 0) {
       return NextResponse.json(
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       contactRole:       String(body.contactRole),
       email:             String(body.email).toLowerCase().trim(),
       phone:             String(body.phone).replace(/\D/g, ''),
+      website:           String(body.website).trim(),
       streetAddress:     body.streetAddress     ?? '',
       city:              String(body.city),
       state:             String(body.state),
@@ -34,9 +35,10 @@ export async function POST(req: NextRequest) {
       locationNote:      body.locationNote      ?? '',
       officeHours:       body.officeHours       ?? {},
       lunchBreak:        body.lunchBreak        ?? '',
+      currentAfterHoursPolicy: body.currentAfterHoursPolicy ?? '',
+      ringiqAfterHoursPolicy:  body.ringiqAfterHoursPolicy  ?? '',
       afterHoursPolicy:  body.afterHoursPolicy  ?? '',
       officeLine2:       body.officeLine2       ?? '',
-      officeLine3:       body.officeLine3       ?? '',
       voice:             body.voice             ?? '',
       vapiVoiceId:       body.vapiVoiceId       ?? '',
       interests:         Array.isArray(body.interests) ? body.interests : [],
@@ -78,6 +80,7 @@ export async function GET() {
       contactRole:       item.contactRole       ?? '',
       email:             item.email             ?? '',
       phone:             item.phone             ?? '',
+      website:           item.website           ?? '',
       streetAddress:     item.streetAddress     ?? '',
       city:              item.city              ?? '',
       state:             item.state             ?? '',
@@ -92,9 +95,10 @@ export async function GET() {
       locationNote:      item.locationNote      ?? '',
       officeHours:       item.officeHours       ?? {},
       lunchBreak:        item.lunchBreak        ?? '',
+      currentAfterHoursPolicy: item.currentAfterHoursPolicy ?? '',
+      ringiqAfterHoursPolicy:  item.ringiqAfterHoursPolicy  ?? '',
       afterHoursPolicy:  item.afterHoursPolicy  ?? '',
       officeLine2:       item.officeLine2       ?? '',
-      officeLine3:       item.officeLine3       ?? '',
       voice:             item.voice             ?? '',
       vapiVoiceId:       item.vapiVoiceId       ?? '',
       interests:         item.interests         ?? [],

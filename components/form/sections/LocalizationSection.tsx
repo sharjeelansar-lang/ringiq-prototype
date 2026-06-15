@@ -10,33 +10,35 @@ import type { FieldPath } from 'react-hook-form';
 const STATE_OPTIONS = US_STATES.map((s) => ({ value: s, label: s }));
 const TZ_OPTIONS    = TIMEZONES.map((t) => ({ value: t.value, label: t.label }));
 
-const AFTER_HOURS_OPTIONS = [
-  { value: 'ai_takes_message',       label: 'AI takes a message'          },
-  { value: 'transfer_voicemail',     label: 'Transfer to voicemail'       },
-  { value: 'ai_emergency_triage',    label: 'AI handles emergency triage' },
-  { value: 'refer_on_call',          label: 'Refer to on-call doctor'     },
-  { value: 'play_outgoing_message',  label: 'Play outgoing message'       },
+const CURRENT_AFTER_HOURS_OPTIONS = [
+  { value: 'Office has voicemail', label: 'Office has voicemail' },
+  { value: 'Office has answering service', label: 'Office has answering service' },
+  { value: 'Office closed, no messaging', label: 'Office closed, no messaging' },
+  { value: 'Other', label: 'Other' },
+];
+
+const RINGIQ_AFTER_HOURS_OPTIONS = [
+  { value: 'Iris talks with patients, books or manages appointments, and takes caller information', label: 'Iris talks with patients, books/manages appointments, and takes caller info' },
+  { value: 'Text the doctor with urgent calls', label: 'Text the doctor with urgent calls' },
+  { value: 'Take a message for staff follow-up', label: 'Take a message for staff follow-up' },
+  { value: 'Transfer urgent calls only', label: 'Transfer urgent calls only' },
+  { value: 'Other', label: 'Other' },
 ];
 
 const DAYS = [
-  { key: 'mondayFriday', label: 'Mon – Fri', canClose: false },
-  { key: 'saturday',     label: 'Saturday',  canClose: true  },
-  { key: 'sunday',       label: 'Sunday',    canClose: true  },
+  { key: 'monday',    label: 'Monday' },
+  { key: 'tuesday',   label: 'Tuesday' },
+  { key: 'wednesday', label: 'Wednesday' },
+  { key: 'thursday',  label: 'Thursday' },
+  { key: 'friday',    label: 'Friday' },
+  { key: 'saturday',  label: 'Saturday' },
+  { key: 'sunday',    label: 'Sunday' },
 ] as const;
 
 interface Props { form: UseFormReturn<BusinessFormSchema>; }
 
 export function LocalizationSection({ form }: Props) {
   const { register, watch, setValue, getFieldState, formState } = form;
-
-  const satClosed = watch('operationalHours.saturday.closed');
-  const sunClosed = watch('operationalHours.sunday.closed');
-
-  const closedMap: Record<string, boolean> = {
-    mondayFriday: false,
-    saturday:     satClosed ?? false,
-    sunday:       sunClosed ?? true,
-  };
 
   const getVisibleError = (name: FieldPath<BusinessFormSchema>) => {
     const fieldState = getFieldState(name, formState);
@@ -113,8 +115,8 @@ export function LocalizationSection({ form }: Props) {
         <SubHeader label="Business Hours" />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {DAYS.map(({ key, label, canClose }) => {
-            const isClosed = closedMap[key];
+          {DAYS.map(({ key, label }) => {
+            const isClosed = watch(`operationalHours.${key}.closed`);
             return (
               <div
                 key={key}
@@ -144,29 +146,25 @@ export function LocalizationSection({ form }: Props) {
                     disabled={isClosed}
                   />
                 </FormField>
-                {canClose ? (
-                  <div style={{ paddingBottom: 4 }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const field = `operationalHours.${key}.closed` as FieldPath<BusinessFormSchema>;
-                        setValue(field, !isClosed, { shouldValidate: false });
-                      }}
-                      style={{
-                        padding: '6px 12px', borderRadius: 6, fontSize: 11, fontWeight: 600,
-                        border: `1.5px solid ${isClosed ? '#FCA5A5' : '#E2E8F0'}`,
-                        background: isClosed ? '#FEF2F2' : '#F8FAFC',
-                        color: isClosed ? '#DC2626' : '#94A3B8',
-                        cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      {isClosed ? 'Closed' : 'Open'}
-                    </button>
-                  </div>
-                ) : (
-                  <div />
-                )}
+                <div style={{ paddingBottom: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const field = `operationalHours.${key}.closed` as FieldPath<BusinessFormSchema>;
+                      setValue(field, !isClosed, { shouldValidate: false });
+                    }}
+                    style={{
+                      padding: '6px 12px', borderRadius: 6, fontSize: 11, fontWeight: 600,
+                      border: `1.5px solid ${isClosed ? '#FCA5A5' : '#A7F3D0'}`,
+                      background: isClosed ? '#FEF2F2' : '#ECFDF5',
+                      color: isClosed ? '#DC2626' : '#047857',
+                      cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {isClosed ? 'Closed' : 'Open'}
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -216,38 +214,26 @@ export function LocalizationSection({ form }: Props) {
           />
         </FormField>
 
-        <FormField
-          label="After-Hours Policy"
-          hint="How Iris handles calls outside business hours"
-        >
-          <Select
-            {...register('afterHoursPolicy')}
-            options={AFTER_HOURS_OPTIONS}
-            placeholder="Select after-hours policy..."
-          />
-        </FormField>
-
-        <SubHeader label="On-Call Doctor" />
-
         <div className="grid grid-cols-2 gap-x-5 gap-y-4">
           <FormField
-            label="On-Call Doctor Name"
-            hint="Referred after hours by AI"
+            label="Current After-Hours Handling"
+            hint="What happens today outside business hours"
           >
-            <Input
-              {...register('onCallDoctorName')}
-              placeholder="Dr. Sarah Mitchell"
+            <Select
+              {...register('currentAfterHoursPolicy')}
+              options={CURRENT_AFTER_HOURS_OPTIONS}
+              placeholder="What happens now?"
             />
           </FormField>
 
           <FormField
-            label="On-Call Mobile Number"
-            hint="E.164 — given to callers in emergencies"
+            label="RingIQ After-Hours Action"
+            hint="What RingIQ should do after close"
           >
-            <Input
-              {...register('onCallDoctorPhone')}
-              placeholder="+12485550199"
-              className="font-mono"
+            <Select
+              {...register('ringiqAfterHoursPolicy')}
+              options={RINGIQ_AFTER_HOURS_OPTIONS}
+              placeholder="What should RingIQ do?"
             />
           </FormField>
         </div>

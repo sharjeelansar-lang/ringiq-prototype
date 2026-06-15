@@ -28,7 +28,7 @@ export function TelephonySection({ form }: Props) {
         </FormField>
 
         <FormField
-          label="Office Line 2 — Staff / 3rd-ring pickup"
+          label="3-Ring Backup / 2nd PEC Line"
           error={errors.officeLine2?.message}
           hint="Staff direct line — forwarded after ring threshold"
         >
@@ -40,18 +40,6 @@ export function TelephonySection({ form }: Props) {
           />
         </FormField>
 
-        <FormField
-          label="Office Line 3 — AI transfer line"
-          error={errors.officeLine3?.message}
-          hint="Line Iris transfers calls to when caller requests staff"
-        >
-          <Input
-            {...register('officeLine3')}
-            placeholder="+12025550003"
-            error={!!errors.officeLine3}
-            className="font-mono"
-          />
-        </FormField>
       </div>
 
       <SubHeader label="Phone Provider" />
