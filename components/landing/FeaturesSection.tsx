@@ -8,7 +8,7 @@ const FEATURES = [
       </svg>
     ),
     title: "Live EHR Scheduling",
-    body:  "Iris queries Schedule Your Exam in real time. She knows your availability, your providers, and your appointment types. She even knows your insurance provisions and if the caller is a new patient.",
+    body:  "Iris queries your Crystal Practice Management system in real time. She knows your availability, your providers, and your appointment types. She even knows your insurance provisions and if the caller is a new patient.",
   },
   {
     icon: (

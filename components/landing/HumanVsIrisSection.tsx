@@ -18,7 +18,7 @@ const IRIS = [
   "Consistent, accurate, professional responses every time",
   "Handles multiple calls simultaneously — zero hold time",
   "Predictable, low per-call cost with no overhead",
-  "Integrates with your EHR and updates automatically",
+  "Integrates with CrystalPM and updates automatically",
 ]
 
 export function HumanVsIrisSection() {

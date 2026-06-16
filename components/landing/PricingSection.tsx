@@ -13,6 +13,7 @@ const PLANS = [
     price:   null,
     freeLabel: "Free",
     note:    "during covered hours",
+    valueCallout: null,
     tag:     null,
     dark:    false,
     body:    "Iris covers after-hours calls only. Perfect for practices that want an AI buffer outside business hours without changing their daytime flow.",
@@ -23,7 +24,8 @@ const PLANS = [
     slug:    "backup",
     name:    "3-Ring Backup",
     price:   "1.50",
-    note:    "per AI call · ~135 calls / mo",
+    note:    "per AI call - estimate 135 calls / mo",
+    valueCallout: "Only pay for what you need.",
     tag:     "Most Popular",
     dark:    true,
     body:    "Iris picks up after 3 rings. Your staff answers first; she's the backup. Only pay for the calls your team can't reach.",
@@ -35,6 +37,7 @@ const PLANS = [
     name:    "Full Service",
     price:   "1",
     note:    "per AI call · ~900 calls / mo",
+    valueCallout: null,
     tag:     null,
     dark:    false,
     body:    "Iris answers every inbound call on the first ring, up to 25 concurrent calls. Built for practices that want zero hold time and zero missed calls.",
@@ -240,8 +243,7 @@ export function PricingSection() {
             Pick the coverage<br />that fits your practice.
           </h2>
           <p className="text-[16px] text-muted-foreground mb-[60px] max-w-[480px]">
-            Every plan includes a dedicated number, live EHR
-            integration, and Iris&apos;s full scheduling capability.
+            Every plan includes a customized AI phone agent, live EHR integration, and scheduling capability. Pay for only the calls AI assists. Calls less than 30 seconds, SPAM calls, and 1-800 calls are not included in billing.
           </p>
         </Reveal>
 
@@ -255,7 +257,19 @@ export function PricingSection() {
                   </div>
                 )}
 
-                <div className={`text-[13px] font-semibold mb-[14px] font-display tracking-[-0.01em] ${p.dark ? "text-teal-bright" : "text-primary"}`}>{p.name}</div>
+                <div className="mb-[14px] flex min-h-10 items-start justify-between gap-4">
+                  <div className={`text-[13px] font-semibold font-display tracking-[-0.01em] ${p.dark ? "text-teal-bright" : "text-primary"}`}>{p.name}</div>
+                  {p.valueCallout && (
+                    <div className="inline-flex max-w-[168px] items-center gap-2 rounded-full border border-[#6ED15C40] bg-[#6ED15C14] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#6ED15C] text-foreground">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      <span className="text-[12.5px] font-semibold leading-[1.15] tracking-[-0.01em] text-[#C8F7BE]">
+                        {p.valueCallout}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 {p.freeLabel ? (
                   <div className={`font-display text-[48px] font-extrabold tracking-tighter leading-none mb-1.5 ${p.dark ? "text-white" : "text-foreground"}`}>
                     {p.freeLabel}

@@ -3,7 +3,7 @@ import { SectionLabel } from "./SectionLabel"
 
 const STEPS = [
   {
-    title: "Your Practice Signs Up",
+    title: "Your Practice",
     body:  "Fill out a short form with your practice details, office hours, and phone numbers. No technical knowledge required.",
     cta:   true,
   },
@@ -25,7 +25,7 @@ export function HowItWorksSection() {
       <div className="lp-container">
         <SectionLabel>How It Works</SectionLabel>
         <h2 className="lp-section-h2">
-          From signup to live<br />in under an hour.
+          Describe your practice. We build and deploy your AI phone agent. You test and launch when ready.
         </h2>
 
         <div className="lp-steps-grid">

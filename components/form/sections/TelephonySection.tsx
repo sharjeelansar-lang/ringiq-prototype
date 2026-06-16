@@ -28,7 +28,7 @@ export function TelephonySection({ form }: Props) {
         </FormField>
 
         <FormField
-          label="3-Ring Backup / 2nd PEC Line"
+          label="3-Ring Backup / 2nd Line"
           error={errors.officeLine2?.message}
           hint="Staff direct line — forwarded after ring threshold"
         >

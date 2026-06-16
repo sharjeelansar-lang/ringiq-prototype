@@ -416,7 +416,7 @@ export default function QueuePage() {
                                   { label: 'EHR System',  value: item.ehrSystem },
                                   { label: 'Call Volume', value: item.monthlyCallVolume },
                                   { label: 'Phone Setup', value: item.currentPhoneSetup },
-                                  { label: '2nd PEC Line', value: item.officeLine2 ? formatPhone(item.officeLine2) : '' },
+                                  { label: '2nd Line', value: item.officeLine2 ? formatPhone(item.officeLine2) : '' },
                                   { label: 'After Hours Now', value: item.currentAfterHoursPolicy },
                                   { label: 'RingIQ After Hours', value: item.ringiqAfterHoursPolicy },
                                 ].map(({ label, value }) => (

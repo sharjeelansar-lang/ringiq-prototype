@@ -127,7 +127,7 @@ export function FaqSection() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section id="faq" className="py-[108px] px-6 bg-background">
+    <section id="faq" className="pt-[108px] pb-12 px-6 bg-background">
       <div className="lp-container">
         <div className="lp-faq-grid">
           <Reveal>
