@@ -3,16 +3,6 @@
 import { SectionLabel } from "./SectionLabel"
 import { Reveal } from "./Reveal"
 
-const PRACTICES = [
-  "Vision Care Center",
-  "EyeCapitol",
-  "Angelina Eye Center",
-  "Scott Conroy Vision",
-  "City of Vision",
-  "NW Hills Eye Care",
-  "Vision Eye Center",
-]
-
 export function TestimonialSection() {
   return (
     <section className="py-[108px] px-6 bg-background">
@@ -42,21 +32,6 @@ export function TestimonialSection() {
               <div className="text-[13px] text-muted-foreground mt-0.5">Owner, TSO — Cedar Park, TX</div>
             </figcaption>
           </figure>
-        </Reveal>
-
-        <Reveal delay={0.1}>
-          <div className="mt-[72px] pt-10 border-t border-border">
-            <p className="text-center text-[12px] font-bold tracking-[0.12em] uppercase text-light mb-7">
-              Trusted by eye doctors &amp; eye care practices across the USA
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-              {PRACTICES.map(name => (
-                <span key={name} className="font-display text-[14.5px] font-bold tracking-[-0.01em] text-[#9AA6B8] whitespace-nowrap select-none">
-                  {name}
-                </span>
-              ))}
-            </div>
-          </div>
         </Reveal>
       </div>
     </section>

@@ -1,11 +1,9 @@
 import Link from "next/link"
-import { IrisIcon } from "./IrisIcon"
 
 export function CtaSection() {
   return (
-    <section className="py-[120px] px-6 bg-background">
+    <section className="pt-8 pb-[120px] px-6 bg-background">
       <div className="lp-container text-center">
-        <IrisIcon size={52} className="mx-auto mb-7" />
         <h2 className="font-display text-[clamp(34px,4.5vw,58px)] font-extrabold tracking-[-0.035em] m-0 mb-5 leading-[1.06] text-foreground">
           Ready to give your<br />front desk a break?
         </h2>

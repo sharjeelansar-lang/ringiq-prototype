@@ -133,32 +133,6 @@ export function LandingFooter() {
           ))}
         </div>
 
-        {/* Newsletter */}
-        <div className="lp-footer-news py-8 border-b border-[#1E293B]">
-          <div>
-            <h4 className="font-display text-[15px] font-bold text-white m-0 mb-1">Sign up for our newsletter</h4>
-            <p className="text-[13px] text-[#94A3B8] m-0">Practice management &amp; AI insights for eye care, monthly.</p>
-          </div>
-          <form
-            className="flex gap-2.5 w-full max-w-[400px]"
-            onSubmit={e => e.preventDefault()}
-          >
-            <input
-              type="email"
-              required
-              placeholder="you@yourpractice.com"
-              aria-label="Email address"
-              className="flex-1 min-w-0 h-11 px-4 rounded-[10px] bg-[#1E293B] border border-[#33415588] text-[13.5px] text-white placeholder-[#64748B] outline-none focus:border-[#5B7BD8] transition-colors"
-            />
-            <button
-              type="submit"
-              className="h-11 px-5 rounded-[10px] bg-primary text-white text-[13.5px] font-semibold border-none cursor-pointer hover:bg-primary-dark transition-colors shrink-0"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
-
         {/* Bottom bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-7">
           <p className="text-[12.5px] text-[#64748B] m-0">

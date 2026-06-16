@@ -557,7 +557,6 @@ input:-webkit-autofill:active {
 
 /* ── Footer ──────────────────────────────────────────────────────────────────── */
 .lp-footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 44px; }
-.lp-footer-news { display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
 
 @media (max-width: 1000px) {
   .lp-footer-grid { grid-template-columns: 1fr 1fr; gap: 40px 28px; }

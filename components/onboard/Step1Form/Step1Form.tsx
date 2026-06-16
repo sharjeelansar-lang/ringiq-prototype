@@ -59,7 +59,7 @@ export function Step1Form({
         <p className="mb-2.5 text-xs leading-normal text-muted-foreground">
           Use the line your office answers after three rings. It can be direct-dial or Main + extension.
         </p>
-        <ObField label={`3-Ring Backup / 2nd PEC line${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
+        <ObField label={`3-Ring Backup / 2nd line${line2Required ? ' *' : ''}`} error={errors.officeLine2}>
           <ObInput value={formatPhoneDisplay(data.officeLine2)} onChange={phoneU('officeLine2')} placeholder="(586) 991-6560" type="tel" hasError={!!errors.officeLine2} />
         </ObField>
       </div>

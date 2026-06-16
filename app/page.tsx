@@ -14,7 +14,6 @@ import { TestimonialSection } from "@/components/landing/TestimonialSection"
 import { PricingSection } from "@/components/landing/PricingSection"
 import { SecuritySection } from "@/components/landing/SecuritySection"
 import { FaqSection } from "@/components/landing/FaqSection"
-import { TrustStrip } from "@/components/landing/TrustStrip"
 import { CtaSection } from "@/components/landing/CtaSection"
 import { LandingFooter } from "@/components/landing/LandingFooter"
 
@@ -43,7 +42,6 @@ export default function LandingPage() {
       <PricingSection />
       <SecuritySection />
       <FaqSection />
-      <TrustStrip />
       <CtaSection />
       <LandingFooter />
     </div>
